@@ -1,0 +1,2602 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chúc Mừng 20/11 - Cô Nguyễn Thị Thuý | Ánh Sáng Tri Thức Vật Lí</title>
+
+  <!-- Tải Google Fonts: Inter cho nội dung hiện đại và Playfair Display cho tiêu đề trang trọng -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,500;1,600&display=swap" rel="stylesheet" />
+
+  <!-- Tải Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tải Tone.js để tạo âm thanh chúc mừng nhẹ nhàng không cần file audio ngoài -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <!-- Cấu hình Tailwind mở rộng font chữ và animation -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+          },
+          animation: {
+            'spin-slow': 'spin 18s linear infinite',
+            'spin-reverse-slow': 'spinReverse 24s linear infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-glow': 'pulseGlow 3.5s ease-in-out infinite',
+          },
+          keyframes: {
+            spinReverse: {
+              '0%': { transform: 'rotate(360deg)' },
+              '100%': { transform: 'rotate(0deg)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.65', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.04)' },
+            }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased overflow-x-hidden selection:bg-amber-400/30 selection:text-amber-200">
+
+  <!-- Canvas nền: Các hạt photon, quỹ đạo và công thức Vật Lí tương tác -->
+  <canvas id="physics-bg-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+  <!-- Canvas lớp trên: Hiệu ứng pháo hoa quang phổ khi mở thiệp / gửi lời chúc -->
+  <canvas id="fireworks-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-[60]"></canvas>
+
+  <!-- Thanh điều hướng cố định (Glassmorphism) -->
+  <header class="fixed top-0 inset-x-0 z-40 backdrop-blur-md bg-slate-950/75 border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <!-- Biểu tượng nguyên tử & Tên trang -->
+      <a href="#top" class="flex items-center gap-2.5 group focus:outline-none">
+        <div class="relative w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-amber-400/20 to-cyan-400/20 border border-amber-300/30">
+          <svg class="w-6 h-6 text-amber-300 animate-spin-slow" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <ellipse cx="32" cy="32" rx="24" ry="10" stroke="currentColor" stroke-width="2.2" transform="rotate(30 32 32)" />
+            <ellipse cx="32" cy="32" rx="24" ry="10" stroke="#38bdf8" stroke-width="2.2" transform="rotate(150 32 32)" />
+            <ellipse cx="32" cy="32" rx="24" ry="10" stroke="#c084fc" stroke-width="2.2" transform="rotate(90 32 32)" />
+            <circle cx="32" cy="32" r="4.5" fill="#fbbf24" />
+          </svg>
+        </div>
+        <div class="leading-tight">
+          <span class="block text-sm font-bold tracking-wide text-white group-hover:text-amber-300 transition">20/11 • VẬT LÍ</span>
+          <span class="block text-[11px] text-slate-400">Tri ân Cô Nguyễn Thị Thuý</span>
+        </div>
+      </a>
+
+      <!-- Menu điều hướng trên màn hình vừa & lớn -->
+      <nav class="hidden md:flex items-center gap-1 text-sm font-medium text-slate-300">
+        <a href="#thiep-tri-an" class="px-3 py-2 rounded-xl hover:text-amber-300 hover:bg-white/5 transition">Thiệp Tri Ân</a>
+        <a href="#dinh-luat" class="px-3 py-2 rounded-xl hover:text-amber-300 hover:bg-white/5 transition">Định Luật Yêu Thương</a>
+        <a href="#lang-kinh" class="px-3 py-2 rounded-xl hover:text-amber-300 hover:bg-white/5 transition">Lăng Kính 20/11</a>
+        <a href="#qua-tang-co" class="px-3 py-2 rounded-xl hover:text-amber-300 hover:bg-white/5 transition">Hộp Quà Cô Thuý</a>
+      </nav>
+
+      <!-- Nút bật/tắt nhạc nền & bắn pháo hoa nhanh -->
+      <div class="flex items-center gap-2">
+        <button id="sound-toggle-btn" type="button" aria-label="Bật hoặc tắt nhạc nền Người Gieo Mầm Xanh"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs sm:text-sm font-medium text-slate-200 transition active:scale-95">
+          <span id="sound-icon" aria-hidden="true">🎵</span>
+          <span id="sound-label" class="hidden sm:inline">Nhạc: Tắt</span>
+        </button>
+        <button id="quick-firework-btn" type="button"
+          class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-semibold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition active:scale-95">
+          ✨ Pháo Hoa
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Nội dung chính -->
+  <main id="top" class="relative z-10 pt-24 pb-20">
+
+    <!-- ==================== PHẦN 1: HERO SECTION ==================== -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-16 sm:pt-14 sm:pb-24 text-center">
+      <!-- Hào quang trang trí mềm mại phía sau -->
+      <div class="relative mx-auto max-w-4xl">
+        <div class="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-amber-400/15 blur-3xl"></div>
+        <div class="pointer-events-none absolute top-10 left-1/4 w-56 h-56 rounded-full bg-cyan-500/15 blur-3xl"></div>
+
+        <!-- Nhãn sự kiện -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-300/30 text-amber-200 text-xs sm:text-sm font-medium mb-6 backdrop-blur-sm">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <span>Kỷ Niệm Ngày Nhà Giáo Việt Nam • 20 Tháng 11</span>
+        </div>
+
+        <!-- Biểu tượng Nguyên tử & Ánh sáng trung tâm -->
+        <div class="mx-auto mb-7 w-28 h-28 sm:w-32 sm:h-32 relative flex items-center justify-center animate-float">
+          <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-400/25 via-cyan-400/20 to-violet-500/25 blur-xl"></div>
+          <svg class="w-full h-full relative z-10 drop-shadow-[0_0_16px_rgba(251,191,36,0.45)]" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+            <ellipse cx="60" cy="60" rx="46" ry="18" stroke="url(#orbitGold)" stroke-width="2" transform="rotate(25 60 60)" />
+            <ellipse cx="60" cy="60" rx="46" ry="18" stroke="url(#orbitCyan)" stroke-width="2" transform="rotate(-25 60 60)" />
+            <ellipse cx="60" cy="60" rx="46" ry="18" stroke="url(#orbitViolet)" stroke-width="2" transform="rotate(90 60 60)" />
+            <!-- Hạt nhân phát sáng -->
+            <circle cx="60" cy="60" r="11" fill="url(#coreGrad)" />
+            <circle cx="60" cy="60" r="17" stroke="#fde68a" stroke-opacity="0.35" stroke-width="1.5" stroke-dasharray="3 3" />
+            <!-- Các electron -->
+            <circle cx="101" cy="79" r="3.5" fill="#fbbf24" />
+            <circle cx="19" cy="41" r="3.5" fill="#38bdf8" />
+            <circle cx="60" cy="14" r="3.5" fill="#c084fc" />
+            <defs>
+              <linearGradient id="orbitGold" x1="14" y1="60" x2="106" y2="60" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#fde68a" stop-opacity="0.2" />
+                <stop offset="0.5" stop-color="#fbbf24" />
+                <stop offset="1" stop-color="#fde68a" stop-opacity="0.2" />
+              </linearGradient>
+              <linearGradient id="orbitCyan" x1="14" y1="60" x2="106" y2="60" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#67e8f9" stop-opacity="0.2" />
+                <stop offset="0.5" stop-color="#38bdf8" />
+                <stop offset="1" stop-color="#67e8f9" stop-opacity="0.2" />
+              </linearGradient>
+              <linearGradient id="orbitViolet" x1="14" y1="60" x2="106" y2="60" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#e9d5ff" stop-opacity="0.2" />
+                <stop offset="0.5" stop-color="#c084fc" />
+                <stop offset="1" stop-color="#e9d5ff" stop-opacity="0.2" />
+              </linearGradient>
+              <radialGradient id="coreGrad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(57 56) rotate(45) scale(16)">
+                <stop stop-color="#fef3c7" />
+                <stop offset="0.5" stop-color="#f59e0b" />
+                <stop offset="1" stop-color="#b45309" />
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- Tiêu đề chính -->
+        <p class="text-sm sm:text-base uppercase tracking-[0.22em] text-cyan-300/90 font-semibold mb-3">
+          Kính Tặng Người Thắp Sáng Tri Thức Vật Lí
+        </p>
+        <h1 class="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-4 leading-tight">
+          Cô <span class="bg-gradient-to-r from-amber-200 via-yellow-300 to-orange-300 bg-clip-text text-transparent">Nguyễn Thị Thuý</span>
+        </h1>
+        <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-300 leading-relaxed mb-9">
+          Cảm ơn cô đã dùng nhiệt huyết của mình để biến những công thức khô khan thành ánh sáng rực rỡ, dẫn lối bao thế hệ học trò khám phá vẻ đẹp kỳ diệu của vũ trụ và cuộc sống.
+        </p>
+
+        <!-- Nút hành động chính -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 mb-12">
+          <a href="#thiep-tri-an" id="hero-open-card-link"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-bold text-base shadow-xl shadow-amber-500/25 transition transform hover:-translate-y-0.5 active:scale-95">
+            <span>💌</span>
+            <span>Mở Thiệp Tri Ân 20/11</span>
+          </a>
+          <a href="#lang-kinh"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-base backdrop-blur-sm transition transform hover:-translate-y-0.5 active:scale-95">
+            <span>🌈</span>
+            <span>Thí Nghiệm Lăng Kính</span>
+          </a>
+        </div>
+
+        <!-- Thẻ thông số Vật Lí vui & ý nghĩa -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+          <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
+            <div class="text-2xl sm:text-3xl font-extrabold text-amber-300 font-serif">c = 3×10⁸ m/s</div>
+            <div class="text-xs sm:text-sm text-slate-400 mt-1">Tốc độ lan tỏa tri thức từ cô</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
+            <div class="text-2xl sm:text-3xl font-extrabold text-cyan-300 font-serif">η = 100%</div>
+            <div class="text-xs sm:text-sm text-slate-400 mt-1">Hiệu suất truyền lửa đam mê</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
+            <div class="text-2xl sm:text-3xl font-extrabold text-violet-300 font-serif">∞ Jun</div>
+            <div class="text-xs sm:text-sm text-slate-400 mt-1">Năng lượng biết ơn của học trò</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PHẦN 2: THIỆP TRI ÂN TƯƠNG TÁC ==================== -->
+    <section id="thiep-tri-an" class="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16 scroll-mt-20">
+      <div class="text-center mb-8">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">Tâm Thư Ngày Nhà Giáo</span>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-white mt-2">Thiệp Tri Ân Gửi Cô Thuý</h2>
+      </div>
+
+      <!-- Khung Thiệp Đóng / Mở -->
+      <div class="relative rounded-3xl p-[1.5px] bg-gradient-to-br from-amber-300/60 via-cyan-400/40 to-violet-500/60 shadow-2xl shadow-indigo-950/70">
+        <div class="rounded-[23px] bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 relative overflow-hidden">
+          <!-- Trang trí góc công thức mờ -->
+          <div class="pointer-events-none absolute top-4 right-6 text-slate-700/40 font-serif italic text-xl sm:text-2xl select-none">E = mc²</div>
+          <div class="pointer-events-none absolute bottom-4 left-6 text-slate-700/40 font-serif italic text-xl sm:text-2xl select-none">λ = v / f</div>
+
+          <!-- Trạng thái 1: Phong bì chưa mở -->
+          <div id="envelope-closed" class="py-8 sm:py-12 text-center transition-all duration-500">
+            <div class="mx-auto w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 border border-amber-300/40 flex items-center justify-center mb-6 shadow-lg shadow-amber-500/10 animate-pulse-glow">
+              <svg class="w-14 h-14 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="16" rx="3" />
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+            </div>
+            <p class="text-xs uppercase tracking-[0.2em] text-cyan-300 mb-2">Phong Thư Đặc Biệt • 20/11</p>
+            <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2">Kính gửi: Cô giáo Nguyễn Thị Thuý</h3>
+            <p class="text-slate-400 text-sm sm:text-base max-w-md mx-auto mb-8">
+              Chạm vào nút bên dưới để mở phong thư tri ân và kích hoạt chùm pháo hoa quang phổ dành tặng cô.
+            </p>
+            <button id="open-envelope-btn" type="button"
+              class="inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-bold text-base shadow-lg shadow-amber-500/30 transition transform hover:scale-105 active:scale-95">
+              <span>✨</span>
+              <span>Mở Thiệp Ngay</span>
+            </button>
+          </div>
+
+          <!-- Trạng thái 2: Nội dung bức thư sau khi mở -->
+          <div id="envelope-opened" class="hidden transition-all duration-700">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-5 mb-6 border-b border-white/10">
+              <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-amber-300 font-semibold">Ngày Nhà Giáo Việt Nam 20/11</p>
+                <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mt-1">Kính gửi Cô Nguyễn Thị Thuý thân mến,</h3>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-cyan-400/15 border border-cyan-300/30 text-cyan-200 text-xs font-medium">
+                ⚛️ Tổ Vật Lí
+              </span>
+            </div>
+
+            <div class="space-y-4 text-slate-200 text-base sm:text-lg leading-relaxed font-normal">
+              <p>
+                Trong thế giới Vật Lí, mọi chuyển động đều cần một nguồn năng lượng khởi đầu, và mọi tia sáng trắng chỉ thực sự bừng lên rực rỡ nhất khi đi qua một chiếc lăng kính trong suốt. Với chúng em, <strong class="text-amber-300 font-semibold">Cô Nguyễn Thị Thuý</strong> chính là nguồn năng lượng ấm áp và chiếc lăng kính diệu kỳ ấy.
+              </p>
+              <p>
+                Nhờ những bài giảng say mê, tỉ mỉ và đầy tâm huyết của cô, những định luật Newton, dòng điện xoay chiều hay sóng ánh sáng không còn là những con số xa vời, mà trở thành những câu chuyện sống động giúp chúng em hiểu hơn về quy luật vận hành tuyệt đẹp của thế giới xung quanh.
+              </p>
+              <p>
+                Nhân ngày Nhà giáo Việt Nam 20/11, chúng em xin kính chúc cô luôn có <strong class="text-cyan-300 font-semibold">sức khỏe dồi dào</strong> như nguồn năng lượng bất tận, <strong class="text-amber-300 font-semibold">nụ cười rạng rỡ</strong> như ánh nắng ban mai, luôn giữ vững ngọn lửa yêu nghề và gặt hái thật nhiều thành công trong sự nghiệp trồng người cao quý!
+              </p>
+            </div>
+
+            <!-- Chữ ký & Nút tương tác -->
+            <div class="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <p class="font-serif italic text-amber-200 text-lg">Với lòng biết ơn sâu sắc nhất,</p>
+                <p class="text-sm text-slate-400 mt-0.5">Tập thể học sinh yêu quý bộ môn Vật Lí</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button id="celebrate-letter-btn" type="button"
+                  class="px-5 py-2.5 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-300/40 text-amber-200 font-semibold text-sm transition active:scale-95">
+                  🎆 Bắn Pháo Hoa Chúc Cô
+                </button>
+                <button id="close-envelope-btn" type="button"
+                  class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-sm transition active:scale-95">
+                  Gấp thiệp
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PHẦN 3: 4 ĐỊNH LUẬT TRI ÂN ==================== -->
+    <section id="dinh-luat" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 scroll-mt-20">
+      <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Khi Vật Lí Hóa Thành Yêu Thương</span>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-white mt-2">Những Định Luật Tri Ân</h2>
+        <p class="text-slate-400 text-sm sm:text-base mt-3">
+          Mời Cô <strong class="text-amber-200 font-semibold">Nguyễn Thị Thuý</strong> nhấn vào từng nút bên dưới để xem mô phỏng hiện tượng Vật Lí sống động kèm lời chúc tri ân.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        <!-- Thẻ 1: Bảo toàn năng lượng -->
+        <article class="group p-6 sm:p-7 rounded-3xl bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 hover:border-amber-300/45 backdrop-blur-md transition duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-amber-400/15 border border-amber-300/30 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                ⚡
+              </div>
+              <div class="flex items-center gap-2 flex-wrap justify-end">
+                <span data-law-viewed="conservation" class="hidden px-2.5 py-1 rounded-xl bg-emerald-400/15 border border-emerald-300/35 text-emerald-200 text-xs font-semibold">
+                  ✓ Đã xem
+                </span>
+                <span class="px-3 py-1 rounded-xl bg-slate-900/80 border border-amber-300/20 text-amber-300 font-mono text-xs sm:text-sm">
+                  W = Wđ + Wt = const
+                </span>
+              </div>
+            </div>
+            <h3 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-amber-200 transition">
+              Định Luật Bảo Toàn Tri Thức
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">
+              Khám phá chuyển hóa Động năng ↔ Thế năng của con lắc ánh sáng và lời tri ân về nguồn tri thức bất tận.
+            </p>
+          </div>
+          <button type="button" data-open-law="conservation"
+            class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400/20 to-orange-500/20 hover:from-amber-400/30 hover:to-orange-500/30 border border-amber-300/40 text-amber-200 font-semibold text-sm transition active:scale-95">
+            <span>⚡</span>
+            <span>Xem Hiện Tượng &amp; Lời Chúc</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </article>
+
+        <!-- Thẻ 2: Tán sắc ánh sáng -->
+        <article class="group p-6 sm:p-7 rounded-3xl bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 hover:border-cyan-300/45 backdrop-blur-md transition duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-cyan-400/15 border border-cyan-300/30 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                🌈
+              </div>
+              <div class="flex items-center gap-2 flex-wrap justify-end">
+                <span data-law-viewed="dispersion" class="hidden px-2.5 py-1 rounded-xl bg-emerald-400/15 border border-emerald-300/35 text-emerald-200 text-xs font-semibold">
+                  ✓ Đã xem
+                </span>
+                <span class="px-3 py-1 rounded-xl bg-slate-900/80 border border-cyan-300/20 text-cyan-300 font-mono text-xs sm:text-sm">
+                  n₁·sin(i) = n₂·sin(r)
+                </span>
+              </div>
+            </div>
+            <h3 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-cyan-200 transition">
+              Hiện Tượng Tán Sắc Ước Mơ
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">
+              Chiêm ngưỡng dải sóng quang phổ 7 màu tách ra từ ánh sáng trắng cùng lời chúc rực rỡ gửi cô.
+            </p>
+          </div>
+          <button type="button" data-open-law="dispersion"
+            class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400/20 to-sky-500/20 hover:from-cyan-400/30 hover:to-sky-500/30 border border-cyan-300/40 text-cyan-200 font-semibold text-sm transition active:scale-95">
+            <span>🌈</span>
+            <span>Xem Hiện Tượng &amp; Lời Chúc</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </article>
+
+        <!-- Thẻ 3: Lực hấp dẫn -->
+        <article class="group p-6 sm:p-7 rounded-3xl bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 hover:border-violet-300/45 backdrop-blur-md transition duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-violet-400/15 border border-violet-300/30 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                🌌
+              </div>
+              <div class="flex items-center gap-2 flex-wrap justify-end">
+                <span data-law-viewed="gravity" class="hidden px-2.5 py-1 rounded-xl bg-emerald-400/15 border border-emerald-300/35 text-emerald-200 text-xs font-semibold">
+                  ✓ Đã xem
+                </span>
+                <span class="px-3 py-1 rounded-xl bg-slate-900/80 border border-violet-300/20 text-violet-300 font-mono text-xs sm:text-sm">
+                  F = G · (m₁m₂ / r²)
+                </span>
+              </div>
+            </div>
+            <h3 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-violet-200 transition">
+              Trường Hấp Dẫn Của Sự Tận Tâm
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">
+              Ngắm các vì sao học trò chuyển động trên quỹ đạo hướng về tâm mặt trời tri thức mang tên Cô Thuý.
+            </p>
+          </div>
+          <button type="button" data-open-law="gravity"
+            class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-violet-400/20 to-indigo-500/20 hover:from-violet-400/30 hover:to-indigo-500/30 border border-violet-300/40 text-violet-200 font-semibold text-sm transition active:scale-95">
+            <span>🌌</span>
+            <span>Xem Hiện Tượng &amp; Lời Chúc</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </article>
+
+        <!-- Thẻ 4: Cộng hưởng -->
+        <article class="group p-6 sm:p-7 rounded-3xl bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 hover:border-rose-300/45 backdrop-blur-md transition duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-rose-400/15 border border-rose-300/30 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                〰️
+              </div>
+              <div class="flex items-center gap-2 flex-wrap justify-end">
+                <span data-law-viewed="resonance" class="hidden px-2.5 py-1 rounded-xl bg-emerald-400/15 border border-emerald-300/35 text-emerald-200 text-xs font-semibold">
+                  ✓ Đã xem
+                </span>
+                <span class="px-3 py-1 rounded-xl bg-slate-900/80 border border-rose-300/20 text-rose-300 font-mono text-xs sm:text-sm">
+                  f = f₀ ⇒ A → A_max
+                </span>
+              </div>
+            </div>
+            <h3 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-rose-200 transition">
+              Sự Cộng Hưởng Của Niềm Đam Mê
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">
+              Quan sát hai làn sóng Cô &amp; Trò hòa chung tần số để biên độ cảm hứng bùng nổ rực rỡ.
+            </p>
+          </div>
+          <button type="button" data-open-law="resonance"
+            class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-rose-400/20 to-pink-500/20 hover:from-rose-400/30 hover:to-pink-500/30 border border-rose-300/40 text-rose-200 font-semibold text-sm transition active:scale-95">
+            <span>〰️</span>
+            <span>Xem Hiện Tượng &amp; Lời Chúc</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- ==================== PHẦN 4: PHÒNG THÍ NGHIỆM LĂNG KÍNH 20/11 ==================== -->
+    <section id="lang-kinh" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 scroll-mt-20">
+      <div class="rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl p-5 sm:p-8 shadow-2xl">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-6">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">Mô Phỏng Quang Học Tương Tác</span>
+            <h2 class="font-serif text-2xl sm:text-4xl font-bold text-white mt-1.5">Lăng Kính Tán Sắc Lời Chúc</h2>
+            <p class="text-slate-400 text-sm sm:text-base mt-2 max-w-2xl">
+              Kéo thanh trượt hoặc chạm trực tiếp vào khung thí nghiệm để điều chỉnh <strong class="text-slate-200">góc tới (i)</strong> của chùm ánh sáng trắng. Lăng kính sẽ tách tia sáng thành 7 sắc cầu vồng mang 7 lời chúc đẹp nhất gửi tặng Cô Nguyễn Thị Thuý!
+            </p>
+          </div>
+          <div class="flex items-center gap-3 text-xs sm:text-sm font-mono bg-slate-950/70 border border-white/10 rounded-2xl px-4 py-2.5 self-start lg:self-auto">
+            <span class="text-amber-300">i = <strong id="angle-readout">34°</strong></span>
+            <span class="text-slate-600">|</span>
+            <span class="text-cyan-300">n = <strong id="index-readout">1.52</strong></span>
+            <span class="text-slate-600">|</span>
+            <span class="text-violet-300">λ: 380–760nm</span>
+          </div>
+        </div>
+
+        <!-- Khung Canvas mô phỏng Lăng Kính -->
+        <div id="prism-container" class="relative w-full h-[450px] sm:h-[500px] rounded-2xl overflow-hidden bg-slate-950 border border-white/10 touch-none cursor-crosshair select-none">
+          <canvas id="prism-canvas" class="w-full h-full block"></canvas>
+        </div>
+        <p class="mt-2.5 text-xs text-slate-400 flex items-center gap-1.5">
+          <span aria-hidden="true">💡</span>
+          <span>Mẹo: Chạm hoặc kéo dọc trực tiếp vào khung lăng kính ở trên để đổi góc chiếu tia sáng.</span>
+        </p>
+
+        <!-- Bộ điều khiển thông số Quang học -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+          <div class="p-4 rounded-2xl bg-slate-900/70 border border-white/10">
+            <div class="flex justify-between text-xs sm:text-sm mb-2">
+              <label for="incident-slider" class="font-medium text-slate-200">Góc tới ánh sáng (i)</label>
+              <span id="incident-val-text" class="font-mono text-amber-300 font-semibold">34°</span>
+            </div>
+            <input id="incident-slider" type="range" min="15" max="62" value="34" step="1"
+              class="w-full accent-amber-400 cursor-pointer h-2 bg-slate-700 rounded-lg" />
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-900/70 border border-white/10">
+            <div class="flex justify-between text-xs sm:text-sm mb-2">
+              <label for="dispersion-slider" class="font-medium text-slate-200">Chiết suất lăng kính (n)</label>
+              <span id="dispersion-val-text" class="font-mono text-cyan-300 font-semibold">1.52</span>
+            </div>
+            <input id="dispersion-slider" type="range" min="1.35" max="1.85" value="1.52" step="0.01"
+              class="w-full accent-cyan-400 cursor-pointer h-2 bg-slate-700 rounded-lg" />
+          </div>
+
+          <div class="flex flex-wrap sm:flex-nowrap gap-2.5">
+            <button id="auto-sweep-btn" type="button"
+              class="flex-1 px-4 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-semibold text-sm transition active:scale-95">
+              🔄 Tự Động Quét
+            </button>
+            <button id="prism-spark-btn" type="button"
+              class="flex-1 px-4 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 hover:from-cyan-300 hover:to-violet-400 text-slate-950 font-bold text-sm transition active:scale-95">
+              ✨ Tỏa Sáng
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PHẦN 5: HỘP QUÀ LƯỢNG TỬ DÀNH RIÊNG CHO CÔ THUÝ ==================== -->
+    <section id="qua-tang-co" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 scroll-mt-20">
+      <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">Món Quà Bí Mật Dành Tặng Cô</span>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-white mt-2">Hộp Quà Lượng Tử 20/11</h2>
+        <p class="text-slate-400 text-sm sm:text-base mt-2.5 leading-relaxed">
+          Theo cơ học lượng tử, mỗi hộp quà đang ở trạng thái bí mật cho đến khi cô chạm vào. Mời <strong class="text-amber-200 font-semibold">Cô Nguyễn Thị Thuý</strong> mở từng hạt quà bên dưới để khám phá 6 lời chúc đặc biệt nhé!
+        </p>
+      </div>
+
+      <!-- Thanh tiến trình mở quà & Nút mở nhanh -->
+      <div class="max-w-3xl mx-auto mb-7 p-4 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="w-full sm:flex-1">
+          <div class="flex items-center justify-between text-xs sm:text-sm mb-2">
+            <span class="text-slate-300 font-medium">Tiến trình mở khóa lời chúc</span>
+            <span id="gift-progress-text" class="font-mono text-amber-300 font-semibold">0 / 6 hạt quà</span>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+            <div id="gift-progress-bar" class="h-full w-0 rounded-full bg-gradient-to-r from-amber-400 via-cyan-400 to-violet-400 transition-all duration-500"></div>
+          </div>
+        </div>
+        <button id="open-all-gifts-btn" type="button"
+          class="w-full sm:w-auto shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400/20 to-violet-400/20 hover:from-amber-400/30 hover:to-violet-400/30 border border-amber-300/35 text-amber-200 font-semibold text-xs sm:text-sm transition active:scale-95">
+          🎁 Mở Tất Cả Quà
+        </button>
+      </div>
+
+      <!-- Lưới 6 Hạt Quà Lượng Tử tương tác -->
+      <div id="quantum-gifts-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <!-- Các hộp quà sẽ được render bằng JavaScript -->
+      </div>
+
+      <!-- Bó hoa tri ân đặc biệt tự động mở khóa khi cô mở đủ 6 hạt quà -->
+      <div id="finale-bouquet-card" class="hidden mt-8 rounded-3xl p-[1.5px] bg-gradient-to-r from-amber-300 via-cyan-400 to-violet-400 shadow-2xl shadow-amber-500/15">
+        <div class="rounded-[23px] bg-slate-900/95 backdrop-blur-xl p-6 sm:p-9 text-center">
+          <div class="text-4xl sm:text-5xl mb-3" aria-hidden="true">💐✨⚛️</div>
+          <p class="text-xs uppercase tracking-[0.2em] text-amber-300 font-semibold mb-2">
+            Đã Mở Khóa Trọn Vẹn 6 Hạt Lời Chúc
+          </p>
+          <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-3">
+            Bó Hoa Tri Thức Kính Tặng Cô Nguyễn Thị Thuý
+          </h3>
+          <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-6">
+            Chúc Cô luôn rạng rỡ, mạnh khỏe, bình an và hạnh phúc trong ngày Nhà giáo Việt Nam 20/11. Cảm ơn Cô vì đã thắp lên ngọn lửa đam mê Vật Lí và những kỷ niệm tuyệt đẹp trong lòng chúng em!
+          </p>
+          <button id="finale-celebrate-btn" type="button"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-bold text-sm sm:text-base shadow-lg shadow-amber-500/25 transition active:scale-95">
+            <span>🎆</span>
+            <span>Bắn Pháo Hoa Mừng 20/11</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Chân trang & Nút thả tim Photon tri ân -->
+  <footer class="relative z-10 border-t border-white/10 bg-slate-950/80 backdrop-blur-md pb-24 sm:pb-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+      <div>
+        <p class="font-serif text-base sm:text-lg font-semibold text-white">
+          Chúc Mừng Ngày Nhà Giáo Việt Nam 20/11
+        </p>
+        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
+          Kính tặng Cô giáo Vật Lí <span class="text-amber-300 font-medium">Nguyễn Thị Thuý</span> • Với tất cả lòng biết ơn
+        </p>
+      </div>
+      <button id="photon-heart-btn" type="button"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-400/35 text-rose-200 text-sm font-semibold transition active:scale-95">
+        <span aria-hidden="true">❤️</span>
+        <span>Gửi Hạt Yêu Thương:</span>
+        <strong id="heart-counter" class="font-mono text-white">2011</strong>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Cửa sổ Modal trình diễn Hiện Tượng Vật Lí & Lời Chúc cho từng Định Luật -->
+  <div id="law-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md" role="dialog" aria-modal="true" aria-labelledby="law-modal-title">
+    <div id="law-modal-border" class="relative w-full max-w-xl max-h-[90vh] flex flex-col rounded-3xl p-[1.5px] bg-gradient-to-br from-amber-300/70 via-cyan-400/50 to-violet-500/70 shadow-2xl">
+      <div class="rounded-[23px] bg-slate-900/95 p-5 sm:p-7 relative overflow-y-auto">
+        <!-- Nút dấu X lớn, dễ chạm trên điện thoại để đóng và xem phần tiếp theo -->
+        <button id="law-modal-close-btn" type="button" aria-label="Đóng cửa sổ"
+          class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-slate-800/95 hover:bg-slate-700 border border-white/25 text-slate-100 hover:text-white flex items-center justify-center text-lg font-bold shadow-lg transition active:scale-90">
+          ✕
+        </button>
+
+        <!-- Phần đầu Modal: Biểu tượng, Công thức & Tiêu đề -->
+        <div class="flex items-center gap-3 pr-12 mb-4">
+          <div id="law-modal-icon" class="w-12 h-12 rounded-2xl bg-amber-400/15 border border-amber-300/35 flex items-center justify-center text-2xl shrink-0">
+            ⚡
+          </div>
+          <div class="min-w-0">
+            <span id="law-modal-formula" class="inline-block px-2.5 py-0.5 rounded-lg bg-slate-950/90 border border-white/10 text-amber-300 font-mono text-xs mb-1">
+              W = Wđ + Wt = const
+            </span>
+            <h3 id="law-modal-title" class="font-serif text-xl sm:text-2xl font-bold text-white leading-snug">
+              Định Luật Bảo Toàn Tri Thức
+            </h3>
+          </div>
+        </div>
+
+        <!-- Khung Canvas mô phỏng Hiện Tượng Vật Lí sống động -->
+        <div id="law-modal-canvas-wrap" class="relative w-full h-[225px] sm:h-[250px] rounded-2xl overflow-hidden bg-slate-950 border border-white/10 mb-4">
+          <canvas id="law-modal-canvas" class="w-full h-full block"></canvas>
+          <span id="law-modal-sim-badge" class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-slate-900/85 border border-white/10 text-[11px] font-medium text-slate-200 backdrop-blur-sm">
+            ⚡ Mô phỏng: Con lắc chuyển hóa Wđ ↔ Wt
+          </span>
+        </div>
+
+        <!-- Lời chúc tri ân đi kèm hiện tượng -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/10 mb-5">
+          <p id="law-modal-wish" class="text-slate-100 text-sm sm:text-base leading-relaxed">
+            Kiến thức và tâm huyết cô trao đi không bao giờ mất đi, mà chuyển hóa từ trang giáo án thành bản lĩnh, ước mơ và thành công của mỗi học trò trên chặng đường tương lai.
+          </p>
+          <p id="law-modal-extra" class="text-amber-200/90 text-xs sm:text-sm italic mt-2.5">
+            Kính chúc Cô Nguyễn Thị Thuý luôn dồi dào sức khỏe và giữ mãi nguồn năng lượng yêu nghề bất tận!
+          </p>
+        </div>
+
+        <!-- Nút bắn pháo hoa & hướng dẫn đóng để xem tiếp -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <span class="text-xs text-slate-400">Chạm nút <strong class="text-slate-200">✕</strong> ở góc trên để xem phần tiếp theo</span>
+          <button id="law-modal-spark-btn" type="button"
+            class="px-4 py-2.5 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-300/35 text-amber-200 font-semibold text-xs sm:text-sm transition active:scale-95">
+            🎆 Bắn Pháo Hoa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thanh phát nhạc nền nổi: Người Gieo Mầm Xanh (Piano 20/11) kèm lời bài hát đồng bộ -->
+  <div id="music-player-bar" class="fixed bottom-3 inset-x-3 sm:left-auto sm:right-6 sm:bottom-5 sm:w-[390px] z-40 transition-all duration-300">
+    <div class="rounded-2xl p-[1px] bg-gradient-to-r from-amber-300/50 via-cyan-400/40 to-violet-400/50 shadow-2xl shadow-slate-950/80">
+      <div class="rounded-[15px] bg-slate-900/95 backdrop-blur-xl px-3.5 py-2.5 flex items-center gap-3">
+        <!-- Nút Phát / Tạm dừng -->
+        <button id="music-bar-toggle-btn" type="button" aria-label="Phát hoặc tạm dừng nhạc Người Gieo Mầm Xanh"
+          class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 flex items-center justify-center font-bold text-sm shadow-lg shadow-amber-500/25 shrink-0 transition active:scale-90">
+          <span id="music-bar-play-icon" aria-hidden="true">▶</span>
+        </button>
+
+        <!-- Tên bài hát & Câu hát đồng bộ -->
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-xs sm:text-sm font-bold text-white truncate">Người Gieo Mầm Xanh</span>
+            <span class="px-1.5 py-0.5 rounded-md bg-amber-400/15 border border-amber-300/30 text-[10px] font-medium text-amber-200 shrink-0">Piano 20/11</span>
+          </div>
+          <p id="music-lyric-text" class="text-[11px] sm:text-xs text-amber-200/85 italic truncate mt-0.5">
+            Chạm ▶ để bật giai điệu tri ân Cô Thuý...
+          </p>
+        </div>
+
+        <!-- Nút thu gọn thanh nhạc -->
+        <button id="music-bar-hide-btn" type="button" aria-label="Thu gọn thanh nhạc"
+          class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center text-xs shrink-0 transition active:scale-90">
+          ✕
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Khung thông báo Toast (Thay thế hoàn toàn cho alert) -->
+  <div id="toast-container" class="fixed top-20 right-4 sm:right-6 z-[70] flex flex-col gap-2 max-w-xs sm:max-w-sm pointer-events-none"></div>
+
+  <!-- Toàn bộ logic tương tác, đồ họa Canvas Vật Lí & âm thanh Tone.js -->
+  <script>
+    (function () {
+      'use strict';
+
+      // -------------------- 1. HỆ THỐNG THÔNG BÁO TOAST (KHÔNG DÙNG ALERT) --------------------
+      function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        const styleMap = {
+          success: 'bg-emerald-950/90 border-emerald-400/40 text-emerald-100',
+          warning: 'bg-amber-950/90 border-amber-400/40 text-amber-100',
+          info: 'bg-slate-900/95 border-cyan-400/35 text-slate-100'
+        };
+
+        toast.className = `pointer-events-auto px-4 py-3 rounded-2xl border backdrop-blur-md shadow-xl text-xs sm:text-sm font-medium transition-all duration-300 translate-y-2 opacity-0 ${styleMap[type] || styleMap.info}`;
+        toast.textContent = message;
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-y-2', 'opacity-0');
+        });
+
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'translate-y-2');
+          setTimeout(() => toast.remove(), 320);
+        }, 3200);
+      }
+
+      // -------------------- 2. HỆ THỐNG ÂM THANH & NHẠC NỀN "NGƯỜI GIEO MẦM XANH" (TONE.JS + DỰ PHÒNG WEB AUDIO) --------------------
+      let soundEnabled = false;
+      let musicPlaying = false;
+      let musicUserPaused = false;
+      let musicStep = 0;
+      let musicTimer = null;
+      let chimeSynth = null;
+      let pianoSynth = null;
+      let padSynth = null;
+      let masterFilter = null;
+      let nativeAudioCtx = null;
+
+      const NOTE_OFFSETS = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+      // Chuyển tên nốt nhạc (VD: 'C5') sang tần số Hz cho bộ phát Web Audio dự phòng
+      function noteToFreq(noteStr) {
+        const match = /^([A-G])(#|b)?(\d)$/.exec(noteStr);
+        if (!match) return 440;
+        let semitone = NOTE_OFFSETS[match[1]];
+        if (match[2] === '#') semitone += 1;
+        if (match[2] === 'b') semitone -= 1;
+        const octave = parseInt(match[3], 10);
+        const midi = (octave + 1) * 12 + semitone;
+        return 440 * Math.pow(2, (midi - 69) / 12);
+      }
+
+      // Bản hòa âm Piano điệp khúc "Người Gieo Mầm Xanh" (8 ô nhịp x 8 phách móc đơn, giọng Đô trưởng ấm áp)
+      const SONG_BARS = [
+        {
+          lyric: '“Và tôi gieo mầm xanh ấy cho cuộc đời...”',
+          pad: ['C3', 'G3', 'E4'],
+          arp: ['C3', 'G3', 'C4', 'E4', 'G3', 'C4', 'E4', 'G3'],
+          melody: [
+            { note: 'E4', dur: '8n', sec: 0.45 },
+            { note: 'G4', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '4n', sec: 0.85 },
+            { note: 'C5', dur: '8n', sec: 0.45 },
+            { note: 'B4', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '8n', sec: 0.45 },
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'G4', dur: '4n', sec: 0.9 }
+          ]
+        },
+        {
+          lyric: '“Nhẹ vun tay và tưới tiêu lên cao vời...”',
+          pad: ['B2', 'G3', 'D4'],
+          arp: ['B2', 'G3', 'B3', 'D4', 'G3', 'B3', 'D4', 'G3'],
+          melody: [
+            { note: 'G4', dur: '8n', sec: 0.45 },
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'B4', dur: '4n', sec: 0.85 },
+            { note: 'B4', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '8n', sec: 0.45 },
+            { note: 'D5', dur: '8n', sec: 0.45 },
+            { note: 'B4', dur: '8n', sec: 0.45 },
+            { note: 'G4', dur: '4n', sec: 0.9 }
+          ]
+        },
+        {
+          lyric: '“Đến một ngày tương lai rồi mầm xanh kia...”',
+          pad: ['A2', 'E3', 'C4'],
+          arp: ['A2', 'E3', 'A3', 'C4', 'E3', 'A3', 'C4', 'E3'],
+          melody: [
+            { note: 'E4', dur: '8n', sec: 0.45 },
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '4n', sec: 0.85 },
+            { note: 'B4', dur: '8n', sec: 0.45 },
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'G4', dur: '8n', sec: 0.45 },
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '4n', sec: 0.9 }
+          ]
+        },
+        {
+          lyric: '“Sẽ tỏa bóng râm chở che các con đường...”',
+          pad: ['E2', 'B2', 'G3'],
+          arp: ['E2', 'B2', 'E3', 'G3', 'B2', 'E3', 'G3', 'B2'],
+          melody: [
+            { note: 'B4', dur: '8n', sec: 0.45 },
+            { note: 'E5', dur: '8n', sec: 0.45 },
+            { note: 'D5', dur: '4n', sec: 0.85 },
+            { note: 'B4', dur: '8n', sec: 0.45 },
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'G4', dur: '8n', sec: 0.45 },
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'G4', dur: '4n', sec: 0.9 }
+          ]
+        },
+        {
+          lyric: '“Ai rồi cũng bước qua cuộc đời...”',
+          pad: ['F2', 'C3', 'A3'],
+          arp: ['F2', 'C3', 'F3', 'A3', 'C3', 'F3', 'A3', 'C3'],
+          melody: [
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '4n', sec: 0.85 },
+            { note: 'D5', dur: '8n', sec: 0.45 },
+            { note: 'E5', dur: '4n', sec: 0.85 },
+            { note: 'D5', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '2n', sec: 1.4 },
+            null
+          ]
+        },
+        {
+          lyric: '“Để lại những hành trang ở đây thế giới...”',
+          pad: ['E2', 'C3', 'G3'],
+          arp: ['E2', 'C3', 'E3', 'G3', 'C3', 'E3', 'G3', 'C3'],
+          melody: [
+            { note: 'G4', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '4n', sec: 0.85 },
+            { note: 'D5', dur: '8n', sec: 0.45 },
+            { note: 'E5', dur: '8n', sec: 0.45 },
+            { note: 'G5', dur: '8n', sec: 0.45 },
+            { note: 'E5', dur: '8n', sec: 0.45 },
+            { note: 'D5', dur: '4n', sec: 0.9 }
+          ]
+        },
+        {
+          lyric: '“Sẽ thật đẹp nếu như một ngày...”',
+          pad: ['D2', 'A2', 'F3'],
+          arp: ['D2', 'A2', 'D3', 'F3', 'A2', 'D3', 'F3', 'A2'],
+          melody: [
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'D5', dur: '8n', sec: 0.45 },
+            { note: 'D5', dur: '4n', sec: 0.85 },
+            { note: 'E5', dur: '8n', sec: 0.45 },
+            { note: 'F5', dur: '4n', sec: 0.85 },
+            { note: 'E5', dur: '8n', sec: 0.45 },
+            { note: 'D5', dur: '2n', sec: 1.4 },
+            null
+          ]
+        },
+        {
+          lyric: '“Ta mỉm cười buông tay, ở dưới tán cây mình gây...”',
+          pad: ['G2', 'D3', 'B3'],
+          arp: ['G2', 'D3', 'G3', 'C4', 'G2', 'D3', 'G3', 'B3'],
+          melody: [
+            { note: 'G4', dur: '8n', sec: 0.45 },
+            { note: 'A4', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '8n', sec: 0.45 },
+            { note: 'D5', dur: '8n', sec: 0.45 },
+            { note: 'E5', dur: '8n', sec: 0.45 },
+            { note: 'D5', dur: '8n', sec: 0.45 },
+            { note: 'B4', dur: '8n', sec: 0.45 },
+            { note: 'C5', dur: '2n', sec: 1.5 }
+          ]
+        }
+      ];
+
+      function initAudio() {
+        try {
+          if (typeof Tone !== 'undefined') {
+            if (!masterFilter) {
+              masterFilter = new Tone.Filter({
+                frequency: 3600,
+                type: 'lowpass',
+                rolloff: -12
+              }).toDestination();
+            }
+            if (!chimeSynth) {
+              chimeSynth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: 'triangle' },
+                envelope: { attack: 0.025, decay: 0.25, sustain: 0.2, release: 1.1 },
+                volume: -8
+              }).connect(masterFilter);
+            }
+            if (!pianoSynth) {
+              pianoSynth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: 'triangle' },
+                envelope: { attack: 0.015, decay: 0.65, sustain: 0.16, release: 1.3 },
+                volume: -4
+              }).connect(masterFilter);
+            }
+            if (!padSynth) {
+              padSynth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: 'sine' },
+                envelope: { attack: 0.45, decay: 0.4, sustain: 0.55, release: 1.8 },
+                volume: -16
+              }).connect(masterFilter);
+            }
+            return 'tone';
+          }
+
+          // Dự phòng bằng Web Audio API gốc nếu CDN Tone.js chưa tải được
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return null;
+          if (!nativeAudioCtx) {
+            nativeAudioCtx = new AudioCtx();
+          }
+          return 'native';
+        } catch (err) {
+          console.warn('Không thể khởi tạo âm thanh:', err);
+          return null;
+        }
+      }
+
+      function playNativeNote(noteStr, durationSec, gainLevel, oscType = 'triangle', delaySec = 0) {
+        if (!nativeAudioCtx) return;
+        try {
+          const now = nativeAudioCtx.currentTime + delaySec;
+          const osc = nativeAudioCtx.createOscillator();
+          const gain = nativeAudioCtx.createGain();
+
+          osc.type = oscType;
+          osc.frequency.setValueAtTime(noteToFreq(noteStr), now);
+
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(Math.max(gainLevel, 0.001), now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+          osc.connect(gain);
+          gain.connect(nativeAudioCtx.destination);
+          osc.start(now);
+          osc.stop(now + durationSec + 0.05);
+        } catch (err) {
+          console.warn('Lỗi phát nốt dự phòng:', err);
+        }
+      }
+
+      function updateMusicUI() {
+        const headerBtn = document.getElementById('sound-toggle-btn');
+        const headerIcon = document.getElementById('sound-icon');
+        const headerLabel = document.getElementById('sound-label');
+        const barPlayIcon = document.getElementById('music-bar-play-icon');
+        const lyricEl = document.getElementById('music-lyric-text');
+        const musicBar = document.getElementById('music-player-bar');
+
+        if (headerIcon) headerIcon.textContent = musicPlaying ? '🔊' : '🎵';
+        if (headerLabel) headerLabel.textContent = musicPlaying ? 'Nhạc: Bật' : 'Nhạc: Tắt';
+        if (barPlayIcon) barPlayIcon.textContent = musicPlaying ? '⏸' : '▶';
+
+        if (headerBtn) {
+          headerBtn.classList.toggle('border-amber-300/60', musicPlaying);
+          headerBtn.classList.toggle('bg-amber-400/15', musicPlaying);
+          headerBtn.classList.toggle('text-amber-200', musicPlaying);
+        }
+
+        if (musicPlaying && musicBar) {
+          musicBar.classList.remove('hidden');
+        }
+        if (!musicPlaying && lyricEl) {
+          lyricEl.textContent = 'Chạm ▶ để bật giai điệu tri ân Cô Thuý...';
+        }
+      }
+
+      function playMusicStep() {
+        if (!musicPlaying) return;
+        try {
+          const engine = initAudio();
+          if (!engine) return;
+
+          const totalSteps = SONG_BARS.length * 8;
+          const currentIdx = musicStep % totalSteps;
+          const barIdx = Math.floor(currentIdx / 8);
+          const stepInBar = currentIdx % 8;
+          const bar = SONG_BARS[barIdx];
+
+          if (stepInBar === 0) {
+            const lyricEl = document.getElementById('music-lyric-text');
+            if (lyricEl) lyricEl.textContent = bar.lyric;
+          }
+
+          if (engine === 'tone') {
+            const now = Tone.now();
+            if (stepInBar === 0) {
+              padSynth.triggerAttackRelease(bar.pad, '1m', now, 0.55);
+            }
+            const arpNote = bar.arp[stepInBar];
+            if (arpNote) {
+              pianoSynth.triggerAttackRelease(arpNote, '4n', now, 0.32);
+            }
+            const mel = bar.melody[stepInBar];
+            if (mel) {
+              pianoSynth.triggerAttackRelease(mel.note, mel.dur, now, 0.85);
+            }
+          } else {
+            if (stepInBar === 0) {
+              bar.pad.forEach((n) => playNativeNote(n, 2.4, 0.045, 'sine'));
+            }
+            const arpNote = bar.arp[stepInBar];
+            if (arpNote) {
+              playNativeNote(arpNote, 0.55, 0.07, 'triangle');
+            }
+            const mel = bar.melody[stepInBar];
+            if (mel) {
+              playNativeNote(mel.note, mel.sec || 0.55, 0.16, 'triangle');
+            }
+          }
+
+          musicStep = (musicStep + 1) % totalSteps;
+        } catch (err) {
+          console.warn('Lỗi nhịp phát nhạc:', err);
+        }
+      }
+
+      async function startBackgroundMusic(isAuto = false) {
+        try {
+          if (musicPlaying) return;
+          soundEnabled = true;
+          musicPlaying = true;
+          musicUserPaused = false;
+          updateMusicUI();
+
+          // Mở khóa AudioContext đồng bộ ngay trong thao tác chạm của người dùng (quan trọng trên iOS)
+          const engine = initAudio();
+          if (engine === 'tone') {
+            await Tone.start();
+            if (Tone.context && Tone.context.state !== 'running') {
+              await Tone.context.resume();
+            }
+          } else if (engine === 'native' && nativeAudioCtx && nativeAudioCtx.state === 'suspended') {
+            await nativeAudioCtx.resume();
+          }
+
+          if (!musicPlaying || !engine) return;
+
+          if (musicTimer) clearInterval(musicTimer);
+          playMusicStep();
+          musicTimer = setInterval(playMusicStep, 375);
+
+          if (!isAuto) {
+            showToast('🎵 Đang phát: Người Gieo Mầm Xanh (Piano 20/11)', 'success');
+          }
+        } catch (err) {
+          musicPlaying = false;
+          updateMusicUI();
+          console.warn('Không thể bật nhạc nền:', err);
+        }
+      }
+
+      function stopBackgroundMusic(silent = false) {
+        musicPlaying = false;
+        soundEnabled = false;
+        musicUserPaused = true;
+        if (musicTimer) {
+          clearInterval(musicTimer);
+          musicTimer = null;
+        }
+        try {
+          if (pianoSynth) pianoSynth.releaseAll();
+          if (padSynth) padSynth.releaseAll();
+        } catch (err) {
+          console.warn('Lỗi dừng nhạc:', err);
+        }
+        updateMusicUI();
+        if (!silent) {
+          showToast('Đã tạm dừng nhạc nền', 'info');
+        }
+      }
+
+      function playChime(chordType = 'celebrate') {
+        if (!soundEnabled) return;
+        try {
+          const engine = initAudio();
+          if (!engine) return;
+
+          if (engine === 'tone') {
+            const now = Tone.now();
+            if (chordType === 'celebrate') {
+              const notes = ['C5', 'E5', 'G5', 'B5', 'C6'];
+              notes.forEach((note, idx) => {
+                chimeSynth.triggerAttackRelease(note, '8n', now + idx * 0.09, 0.55);
+              });
+            } else if (chordType === 'spark') {
+              chimeSynth.triggerAttackRelease(['G5', 'B5', 'D6'], '16n', now, 0.45);
+            } else if (chordType === 'heart') {
+              chimeSynth.triggerAttackRelease('A5', '16n', now, 0.45);
+              chimeSynth.triggerAttackRelease('E6', '16n', now + 0.08, 0.45);
+            }
+          } else {
+            if (chordType === 'celebrate') {
+              ['C5', 'E5', 'G5', 'B5', 'C6'].forEach((n, idx) => {
+                playNativeNote(n, 0.45, 0.1, 'triangle', idx * 0.09);
+              });
+            } else if (chordType === 'spark') {
+              ['G5', 'B5', 'D6'].forEach((n) => playNativeNote(n, 0.25, 0.08, 'triangle'));
+            } else if (chordType === 'heart') {
+              playNativeNote('A5', 0.25, 0.09, 'triangle', 0);
+              playNativeNote('E6', 0.28, 0.09, 'triangle', 0.08);
+            }
+          }
+        } catch (err) {
+          console.warn('Lỗi phát âm thanh:', err);
+        }
+      }
+
+      function setupSoundToggle() {
+        const headerBtn = document.getElementById('sound-toggle-btn');
+        const barToggleBtn = document.getElementById('music-bar-toggle-btn');
+        const barHideBtn = document.getElementById('music-bar-hide-btn');
+        const musicBar = document.getElementById('music-player-bar');
+
+        function handleToggleMusic() {
+          if (musicPlaying) {
+            stopBackgroundMusic(false);
+          } else {
+            startBackgroundMusic(false);
+          }
+        }
+
+        if (headerBtn) {
+          headerBtn.addEventListener('click', handleToggleMusic);
+        }
+        if (barToggleBtn) {
+          barToggleBtn.addEventListener('click', handleToggleMusic);
+        }
+        if (barHideBtn && musicBar) {
+          barHideBtn.addEventListener('click', () => {
+            musicBar.classList.add('hidden');
+          });
+        }
+        updateMusicUI();
+      }
+
+      // -------------------- 3. CANVAS NỀN: HẠT PHOTON & CÔNG THỨC VẬT LÍ --------------------
+      const bgCanvas = document.getElementById('physics-bg-canvas');
+      const bgCtx = bgCanvas ? bgCanvas.getContext('2d') : null;
+      let bgWidth = 0;
+      let bgHeight = 0;
+      let bgParticles = [];
+      let bgFormulas = [];
+      const pointer = { x: -1000, y: -1000 };
+
+      const PHYSICS_SYMBOLS = [
+        'E = mc²', 'F = ma', 'λ = v/f', 'ω = 2πf',
+        'U = I·R', 'Φ = B·S·cosα', 'hν', 'ΔE', 'n₁sin(i) = n₂sin(r)', '20/11'
+      ];
+
+      function resizeBgCanvas() {
+        if (!bgCanvas || !bgCtx) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        bgWidth = window.innerWidth;
+        bgHeight = window.innerHeight;
+        bgCanvas.width = bgWidth * dpr;
+        bgCanvas.height = bgHeight * dpr;
+        bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // Khởi tạo lại hạt tương thích với kích thước màn hình
+        const particleCount = bgWidth < 640 ? 28 : 55;
+        bgParticles = Array.from({ length: particleCount }, () => ({
+          x: Math.random() * bgWidth,
+          y: Math.random() * bgHeight,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.45,
+          r: Math.random() * 1.8 + 0.8,
+          hue: Math.random() > 0.45 ? 43 : 196 // Vàng ánh kim & xanh cyan
+        }));
+
+        const formulaCount = bgWidth < 640 ? 7 : 13;
+        bgFormulas = Array.from({ length: formulaCount }, (_, idx) => ({
+          text: PHYSICS_SYMBOLS[idx % PHYSICS_SYMBOLS.length],
+          x: Math.random() * bgWidth,
+          y: Math.random() * bgHeight,
+          vy: -(Math.random() * 0.18 + 0.08),
+          opacity: Math.random() * 0.14 + 0.06,
+          size: Math.random() * 5 + 12
+        }));
+      }
+
+      function renderBgFrame() {
+        if (!bgCtx) return;
+        bgCtx.clearRect(0, 0, bgWidth, bgHeight);
+
+        // Vẽ các công thức Vật Lí trôi nhẹ nhàng
+        bgCtx.textAlign = 'center';
+        for (let i = 0; i < bgFormulas.length; i++) {
+          const f = bgFormulas[i];
+          f.y += f.vy;
+          if (f.y < -30) {
+            f.y = bgHeight + 30;
+            f.x = Math.random() * bgWidth;
+          }
+          bgCtx.font = `italic ${f.size}px "Playfair Display", serif`;
+          bgCtx.fillStyle = `rgba(253, 230, 138, ${f.opacity})`;
+          bgCtx.fillText(f.text, f.x, f.y);
+        }
+
+        // Vẽ các hạt photon & đường liên kết trường lực
+        for (let i = 0; i < bgParticles.length; i++) {
+          const p = bgParticles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0 || p.x > bgWidth) p.vx *= -1;
+          if (p.y < 0 || p.y > bgHeight) p.vy *= -1;
+
+          // Tương tác nhẹ với vị trí con trỏ
+          const dxMouse = pointer.x - p.x;
+          const dyMouse = pointer.y - p.y;
+          const distMouse = Math.hypot(dxMouse, dyMouse);
+          if (distMouse < 130 && distMouse > 1) {
+            p.x -= (dxMouse / distMouse) * 0.25;
+            p.y -= (dyMouse / distMouse) * 0.25;
+          }
+
+          bgCtx.beginPath();
+          bgCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          bgCtx.fillStyle = `hsla(${p.hue}, 92%, 72%, 0.7)`;
+          bgCtx.fill();
+
+          // Nối dây các hạt gần nhau
+          for (let j = i + 1; j < bgParticles.length; j++) {
+            const p2 = bgParticles[j];
+            const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+            if (dist < 115) {
+              const alpha = (1 - dist / 115) * 0.16;
+              bgCtx.beginPath();
+              bgCtx.moveTo(p.x, p.y);
+              bgCtx.lineTo(p2.x, p2.y);
+              bgCtx.strokeStyle = `rgba(148, 163, 184, ${alpha})`;
+              bgCtx.lineWidth = 0.8;
+              bgCtx.stroke();
+            }
+          }
+        }
+      }
+
+      // -------------------- 4. CANVAS PHÁO HOA QUANG PHỔ --------------------
+      const fwCanvas = document.getElementById('fireworks-canvas');
+      const fwCtx = fwCanvas ? fwCanvas.getContext('2d') : null;
+      let fwWidth = 0;
+      let fwHeight = 0;
+      let fwSparks = [];
+
+      const SPECTRUM_COLORS = [
+        '#fbbf24', '#f97316', '#ef4444', '#22c55e', '#38bdf8', '#818cf8', '#e879f9', '#fef08a'
+      ];
+
+      function resizeFwCanvas() {
+        if (!fwCanvas || !fwCtx) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        fwWidth = window.innerWidth;
+        fwHeight = window.innerHeight;
+        fwCanvas.width = fwWidth * dpr;
+        fwCanvas.height = fwHeight * dpr;
+        fwCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function launchFireworkBurst(x, y, count = 42) {
+        const cx = typeof x === 'number' ? x : fwWidth * (0.2 + Math.random() * 0.6);
+        const cy = typeof y === 'number' ? y : fwHeight * (0.18 + Math.random() * 0.35);
+        for (let i = 0; i < count; i++) {
+          const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.25;
+          const speed = Math.random() * 4.5 + 1.8;
+          fwSparks.push({
+            x: cx,
+            y: cy,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 1,
+            decay: Math.random() * 0.015 + 0.012,
+            size: Math.random() * 2.6 + 1.4,
+            color: SPECTRUM_COLORS[Math.floor(Math.random() * SPECTRUM_COLORS.length)]
+          });
+        }
+      }
+
+      function triggerCelebrationSalvo() {
+        playChime('celebrate');
+        launchFireworkBurst(fwWidth * 0.28, fwHeight * 0.28, 45);
+        setTimeout(() => launchFireworkBurst(fwWidth * 0.72, fwHeight * 0.24, 45), 220);
+        setTimeout(() => launchFireworkBurst(fwWidth * 0.5, fwHeight * 0.34, 58), 460);
+      }
+
+      function renderFireworksFrame() {
+        if (!fwCtx) return;
+        fwCtx.clearRect(0, 0, fwWidth, fwHeight);
+
+        for (let i = fwSparks.length - 1; i >= 0; i--) {
+          const s = fwSparks[i];
+          s.x += s.vx;
+          s.y += s.vy;
+          s.vy += 0.055; // Gia tốc trọng trường g
+          s.vx *= 0.985;
+          s.life -= s.decay;
+
+          if (s.life <= 0) {
+            fwSparks.splice(i, 1);
+            continue;
+          }
+
+          fwCtx.save();
+          fwCtx.globalAlpha = Math.max(s.life, 0);
+          fwCtx.beginPath();
+          fwCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          fwCtx.fillStyle = s.color;
+          fwCtx.shadowColor = s.color;
+          fwCtx.shadowBlur = 10;
+          fwCtx.fill();
+          fwCtx.restore();
+        }
+      }
+
+      // -------------------- 5. PHÒNG THÍ NGHIỆM LĂNG KÍNH TÁN SẮC 20/11 --------------------
+      const prismCanvas = document.getElementById('prism-canvas');
+      const prismContainer = document.getElementById('prism-container');
+      const prismCtx = prismCanvas ? prismCanvas.getContext('2d') : null;
+
+      let prismWidth = 600;
+      let prismHeight = 360;
+      let incidentAngleDeg = 34;
+      let baseRefractiveIndex = 1.52;
+      let autoSweep = false;
+      let sweepPhase = 0;
+      let prismPulse = 0;
+
+      // 7 màu quang phổ gắn với 7 lời chúc tặng Cô Nguyễn Thị Thuý
+      const RAINBOW_WISHES = [
+        { name: 'Nhiệt Huyết', color: '#ff4d4d', deltaN: -0.045 },
+        { name: 'Hạnh Phúc', color: '#ff944d', deltaN: -0.028 },
+        { name: 'Thành Công', color: '#ffd633', deltaN: -0.012 },
+        { name: 'Sức Khỏe', color: '#4ade80', deltaN: 0.004 },
+        { name: 'Bình An', color: '#38bdf8', deltaN: 0.022 },
+        { name: 'Vững Bước', color: '#818cf8', deltaN: 0.042 },
+        { name: 'Yêu Thương', color: '#d946ef', deltaN: 0.064 }
+      ];
+
+      function resizePrismCanvas() {
+        if (!prismCanvas || !prismContainer || !prismCtx) return;
+        const rect = prismContainer.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        prismWidth = Math.max(rect.width, 280);
+        prismHeight = Math.max(rect.height, 260);
+        prismCanvas.width = prismWidth * dpr;
+        prismCanvas.height = prismHeight * dpr;
+        prismCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function updatePrismReadout() {
+        const angleReadout = document.getElementById('angle-readout');
+        const indexReadout = document.getElementById('index-readout');
+        const incidentValText = document.getElementById('incident-val-text');
+        const dispersionValText = document.getElementById('dispersion-val-text');
+        const incidentSlider = document.getElementById('incident-slider');
+
+        const roundedAngle = Math.round(incidentAngleDeg);
+        if (angleReadout) angleReadout.textContent = `${roundedAngle}°`;
+        if (incidentValText) incidentValText.textContent = `${roundedAngle}°`;
+        if (indexReadout) indexReadout.textContent = baseRefractiveIndex.toFixed(2);
+        if (dispersionValText) dispersionValText.textContent = baseRefractiveIndex.toFixed(2);
+        if (incidentSlider && autoSweep) incidentSlider.value = roundedAngle;
+      }
+
+      function renderPrismFrame() {
+        if (!prismCtx) return;
+
+        if (autoSweep) {
+          sweepPhase += 0.022;
+          incidentAngleDeg = 38 + Math.sin(sweepPhase) * 20;
+          updatePrismReadout();
+        }
+        if (prismPulse > 0) prismPulse *= 0.94;
+
+        const w = prismWidth;
+        const h = prismHeight;
+        prismCtx.clearRect(0, 0, w, h);
+
+        // Nền lưới tọa độ phòng thí nghiệm tinh tế
+        prismCtx.strokeStyle = 'rgba(148, 163, 184, 0.06)';
+        prismCtx.lineWidth = 1;
+        const gridStep = 28;
+        for (let gx = 0; gx < w; gx += gridStep) {
+          prismCtx.beginPath();
+          prismCtx.moveTo(gx, 0);
+          prismCtx.lineTo(gx, h);
+          prismCtx.stroke();
+        }
+        for (let gy = 0; gy < h; gy += gridStep) {
+          prismCtx.beginPath();
+          prismCtx.moveTo(0, gy);
+          prismCtx.lineTo(w, gy);
+          prismCtx.stroke();
+        }
+
+        // Đặt lăng kính lớn và dịch sang trái một chút để chùm 7 tia cầu vồng tỏa rộng, dễ nhìn trên điện thoại
+        const isSmall = w < 540;
+        const cx = isSmall ? w * 0.23 : w * 0.31;
+        const cy = h * 0.5;
+        const side = Math.min(w * (isSmall ? 0.3 : 0.24), h * 0.35);
+        const triH = (Math.sqrt(3) / 2) * side;
+
+        const topV = { x: cx, y: cy - triH * 0.58 };
+        const leftV = { x: cx - side / 2, y: cy + triH * 0.42 };
+        const rightV = { x: cx + side / 2, y: cy + triH * 0.42 };
+
+        // 1. Tính điểm tia sáng trắng chạm mặt bên trái của lăng kính và vẽ tia tới
+        const hitT = 0.46;
+        const hitX = topV.x + (leftV.x - topV.x) * hitT;
+        const hitY = topV.y + (leftV.y - topV.y) * hitT;
+
+        const incRad = (incidentAngleDeg * Math.PI) / 180;
+        const edgeDx = leftV.x - topV.x;
+        const edgeDy = leftV.y - topV.y;
+        const normalAngle = Math.atan2(edgeDx, -edgeDy);
+        const sourceAngle = normalAngle - incRad;
+
+        const incBeamLen = Math.hypot(w, h);
+        const startX = hitX + Math.cos(sourceAngle) * incBeamLen;
+        const startY = hitY + Math.sin(sourceAngle) * incBeamLen;
+
+        // Vẽ đường pháp tuyến nét đứt tại điểm tới
+        prismCtx.save();
+        prismCtx.setLineDash([5, 5]);
+        prismCtx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
+        prismCtx.lineWidth = 1.2;
+        prismCtx.beginPath();
+        prismCtx.moveTo(hitX + Math.cos(normalAngle) * 44, hitY + Math.sin(normalAngle) * 44);
+        prismCtx.lineTo(hitX - Math.cos(normalAngle) * 44, hitY - Math.sin(normalAngle) * 44);
+        prismCtx.stroke();
+        prismCtx.restore();
+
+        // Vẽ chùm tia sáng trắng chiếu vào lăng kính
+        prismCtx.save();
+        prismCtx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+        prismCtx.lineWidth = 10 + prismPulse * 4;
+        prismCtx.lineCap = 'round';
+        prismCtx.beginPath();
+        prismCtx.moveTo(startX, startY);
+        prismCtx.lineTo(hitX, hitY);
+        prismCtx.stroke();
+
+        prismCtx.strokeStyle = '#ffffff';
+        prismCtx.lineWidth = 3.5 + prismPulse * 1.5;
+        prismCtx.shadowColor = '#fef08a';
+        prismCtx.shadowBlur = 14;
+        prismCtx.beginPath();
+        prismCtx.moveTo(startX, startY);
+        prismCtx.lineTo(hitX, hitY);
+        prismCtx.stroke();
+        prismCtx.restore();
+
+        // 2. Tính toán 7 chùm tia tán sắc chuyển động tự do, mượt mà theo góc tới (i) và chiết suất (n)
+        const effPrismAngle = 0.74;
+        const sinR1Base = Math.sin(incRad) / baseRefractiveIndex;
+        const r1Base = Math.asin(Math.min(Math.max(sinR1Base, -0.95), 0.95));
+        const r2Base = effPrismAngle - r1Base;
+        const sinI2Base = Math.min(Math.max(baseRefractiveIndex * Math.sin(r2Base), -0.95), 0.95);
+        const i2Base = Math.asin(sinI2Base);
+
+        // Góc nghiêng toàn chùm cầu vồng thay đổi tự nhiên khi kéo góc tới (i)
+        const rawTilt = (i2Base - 0.52) * (isSmall ? 0.34 : 0.26);
+        const baseTilt = Math.min(Math.max(rawTilt, -0.16), 0.16);
+
+        // Độ mở rộng dải quang phổ thay đổi rõ rệt theo chiết suất (n) và luôn tách đều không chạm chữ
+        const nNorm = Math.min(Math.max((baseRefractiveIndex - 1.35) / 0.5, 0), 1);
+        const angleStep = isSmall ? 0.125 + nNorm * 0.04 : 0.08 + nNorm * 0.04;
+
+        const padX = isSmall ? 10 : 20;
+        const padY = 24;
+        const rayDrawLen = Math.hypot(w, h) + 80;
+
+        const raysData = RAINBOW_WISHES.map((ray, idx) => {
+          const offset = idx - 3;
+          const exitT = Math.min(Math.max(0.47 + offset * 0.052 + (r1Base - 0.35) * 0.2, 0.15), 0.87);
+          const exitX = topV.x + (rightV.x - topV.x) * exitT;
+          const exitY = topV.y + (rightV.y - topV.y) * exitT;
+
+          const rayAngle = baseTilt + offset * angleStep;
+          const cosA = Math.cos(rayAngle);
+          const sinA = Math.sin(rayAngle);
+          const endX = exitX + cosA * rayDrawLen;
+          const endY = exitY + sinA * rayDrawLen;
+
+          // Tính đúng khoảng cách tối đa dọc theo tia trước khi chạm mép khung để chữ luôn gọn trong màn hình
+          const tMaxX = (w - padX - exitX) / cosA;
+          let tMaxY = Infinity;
+          if (sinA > 0.001) {
+            tMaxY = (h - padY - exitY) / sinA;
+          } else if (sinA < -0.001) {
+            tMaxY = (padY - exitY) / sinA;
+          }
+          const tEnd = Math.max(Math.min(tMaxX, tMaxY) - 6, 105);
+
+          return { ray, exitX, exitY, endX, endY, rayAngle, tEnd };
+        });
+
+        // 3. Vẽ 7 chùm tia sáng cầu vồng tỏa rộng xuyên suốt màn hình
+        raysData.forEach(({ ray, exitX, exitY, endX, endY }) => {
+          // Tia khúc xạ bên trong khối thủy tinh
+          prismCtx.save();
+          prismCtx.strokeStyle = ray.color;
+          prismCtx.globalAlpha = 0.62;
+          prismCtx.lineWidth = 2.2;
+          prismCtx.beginPath();
+          prismCtx.moveTo(hitX, hitY);
+          prismCtx.lineTo(exitX, exitY);
+          prismCtx.stroke();
+
+          // Quầng sáng mềm rộng tạo hiệu ứng chùm tia quang phổ rực rỡ
+          prismCtx.globalAlpha = 0.24;
+          prismCtx.lineWidth = (isSmall ? 12 : 14) + prismPulse * 6;
+          prismCtx.lineCap = 'round';
+          prismCtx.beginPath();
+          prismCtx.moveTo(exitX, exitY);
+          prismCtx.lineTo(endX, endY);
+          prismCtx.stroke();
+
+          // Thân tia màu sắc nét
+          prismCtx.globalAlpha = 0.84;
+          prismCtx.lineWidth = (isSmall ? 4.2 : 5) + prismPulse * 2.5;
+          prismCtx.shadowColor = ray.color;
+          prismCtx.shadowBlur = 14 + prismPulse * 12;
+          prismCtx.beginPath();
+          prismCtx.moveTo(exitX, exitY);
+          prismCtx.lineTo(endX, endY);
+          prismCtx.stroke();
+
+          // Lõi sáng trắng mảnh tạo cảm giác ánh sáng thật
+          prismCtx.globalAlpha = 0.45;
+          prismCtx.strokeStyle = '#ffffff';
+          prismCtx.lineWidth = 1.4;
+          prismCtx.shadowBlur = 0;
+          prismCtx.beginPath();
+          prismCtx.moveTo(exitX, exitY);
+          prismCtx.lineTo(endX, endY);
+          prismCtx.stroke();
+          prismCtx.restore();
+        });
+
+        // 4. Vẽ chữ lời chúc và ngôi sao xoay trùng khít 100% dọc theo tâm của từng tia sáng
+        raysData.forEach(({ ray, exitX, exitY, rayAngle, tEnd }) => {
+          const fontSize = isSmall ? 13.5 : 15.5;
+
+          prismCtx.save();
+          prismCtx.translate(exitX, exitY);
+          prismCtx.rotate(rayAngle);
+
+          prismCtx.font = `700 ${fontSize}px Inter, sans-serif`;
+          prismCtx.textAlign = 'right';
+          prismCtx.textBaseline = 'middle';
+          prismCtx.lineJoin = 'round';
+
+          const textWidth = prismCtx.measureText(ray.name).width;
+          const starX = tEnd - textWidth - (isSmall ? 11 : 13);
+
+          // Viền tối mượt quanh chữ để chữ trắng nổi rõ ngay trên lõi tia sáng
+          prismCtx.lineWidth = 5;
+          prismCtx.strokeStyle = 'rgba(2, 6, 23, 0.94)';
+          prismCtx.strokeText(ray.name, tEnd, 0);
+
+          // Chữ trắng sáng bám đúng tâm tia (y = 0)
+          prismCtx.fillStyle = '#ffffff';
+          prismCtx.shadowColor = 'rgba(2, 6, 23, 0.9)';
+          prismCtx.shadowBlur = 8;
+          prismCtx.fillText(ray.name, tEnd, 0);
+
+          // Ngôi sao màu quang phổ nằm chính tâm tia sáng ngay trước chữ
+          prismCtx.textAlign = 'center';
+          prismCtx.font = `700 ${fontSize + 1}px Inter, sans-serif`;
+          prismCtx.lineWidth = 4.5;
+          prismCtx.strokeStyle = 'rgba(2, 6, 23, 0.95)';
+          prismCtx.shadowBlur = 0;
+          prismCtx.strokeText('✦', starX, 0);
+          prismCtx.fillStyle = ray.color;
+          prismCtx.shadowColor = ray.color;
+          prismCtx.shadowBlur = 10;
+          prismCtx.fillText('✦', starX, 0);
+          prismCtx.restore();
+        });
+
+        // 5. Vẽ khối Lăng Kính thủy tinh trong suốt chồng lên trên để tạo chiều sâu quang học
+        prismCtx.save();
+        const glassGrad = prismCtx.createLinearGradient(leftV.x, topV.y, rightV.x, rightV.y);
+        glassGrad.addColorStop(0, 'rgba(224, 242, 254, 0.24)');
+        glassGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.09)');
+        glassGrad.addColorStop(1, 'rgba(251, 191, 36, 0.18)');
+
+        prismCtx.beginPath();
+        prismCtx.moveTo(topV.x, topV.y);
+        prismCtx.lineTo(rightV.x, rightV.y);
+        prismCtx.lineTo(leftV.x, leftV.y);
+        prismCtx.closePath();
+        prismCtx.fillStyle = glassGrad;
+        prismCtx.fill();
+
+        prismCtx.lineWidth = 2.2;
+        prismCtx.strokeStyle = 'rgba(226, 232, 240, 0.7)';
+        prismCtx.shadowColor = 'rgba(56, 189, 248, 0.45)';
+        prismCtx.shadowBlur = 14;
+        prismCtx.stroke();
+
+        // Ghi chữ "Cô Thuý" tinh tế bên trong lăng kính
+        prismCtx.shadowBlur = 0;
+        prismCtx.font = `700 ${isSmall ? 13 : 15}px "Playfair Display", serif`;
+        prismCtx.fillStyle = 'rgba(254, 243, 199, 0.92)';
+        prismCtx.textAlign = 'center';
+        prismCtx.fillText('Cô Thuý', cx, cy + triH * 0.22);
+        prismCtx.restore();
+
+        // Điểm sáng lóe lên nơi tia trắng chạm mặt lăng kính
+        prismCtx.save();
+        const flare = prismCtx.createRadialGradient(hitX, hitY, 1, hitX, hitY, 16 + prismPulse * 10);
+        flare.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        flare.addColorStop(0.4, 'rgba(254, 240, 138, 0.65)');
+        flare.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        prismCtx.fillStyle = flare;
+        prismCtx.beginPath();
+        prismCtx.arc(hitX, hitY, 16 + prismPulse * 10, 0, Math.PI * 2);
+        prismCtx.fill();
+        prismCtx.restore();
+      }
+
+      function setupPrismControls() {
+        const incidentSlider = document.getElementById('incident-slider');
+        const dispersionSlider = document.getElementById('dispersion-slider');
+        const autoSweepBtn = document.getElementById('auto-sweep-btn');
+        const sparkBtn = document.getElementById('prism-spark-btn');
+
+        if (incidentSlider) {
+          incidentSlider.addEventListener('input', (e) => {
+            autoSweep = false;
+            if (autoSweepBtn) autoSweepBtn.textContent = '🔄 Tự Động Quét';
+            incidentAngleDeg = Number(e.target.value);
+            updatePrismReadout();
+          });
+        }
+
+        if (dispersionSlider) {
+          dispersionSlider.addEventListener('input', (e) => {
+            baseRefractiveIndex = Number(e.target.value);
+            updatePrismReadout();
+          });
+        }
+
+        if (autoSweepBtn) {
+          autoSweepBtn.addEventListener('click', () => {
+            autoSweep = !autoSweep;
+            autoSweepBtn.textContent = autoSweep ? '⏸ Dừng Quét' : '🔄 Tự Động Quét';
+            playChime('spark');
+          });
+        }
+
+        if (sparkBtn) {
+          sparkBtn.addEventListener('click', () => {
+            prismPulse = 1.4;
+            playChime('celebrate');
+            const rect = prismContainer.getBoundingClientRect();
+            launchFireworkBurst(rect.left + rect.width * 0.6, rect.top + rect.height * 0.45, 50);
+            showToast('✨ Ánh sáng tri thức đang tỏa sáng rực rỡ tặng Cô Thuý!', 'success');
+          });
+        }
+
+        // Hỗ trợ kéo chuột & cảm ứng trực tiếp trên canvas lăng kính
+        let draggingPrism = false;
+        function handlePrismPointer(clientY) {
+          if (!prismContainer) return;
+          const rect = prismContainer.getBoundingClientRect();
+          const ratio = Math.min(Math.max((clientY - rect.top) / rect.height, 0), 1);
+          autoSweep = false;
+          if (autoSweepBtn) autoSweepBtn.textContent = '🔄 Tự Động Quét';
+          incidentAngleDeg = 15 + ratio * 47;
+          if (incidentSlider) incidentSlider.value = Math.round(incidentAngleDeg);
+          updatePrismReadout();
+        }
+
+        if (prismContainer) {
+          prismContainer.addEventListener('mousedown', (e) => {
+            draggingPrism = true;
+            handlePrismPointer(e.clientY);
+          });
+
+          window.addEventListener('mousemove', (e) => {
+            pointer.x = e.clientX;
+            pointer.y = e.clientY;
+            if (draggingPrism) {
+              handlePrismPointer(e.clientY);
+            }
+          });
+
+          window.addEventListener('mouseup', () => {
+            draggingPrism = false;
+          });
+
+          prismContainer.addEventListener(
+            'touchstart',
+            (e) => {
+              if (e.touches && e.touches.length > 0) {
+                e.preventDefault();
+                draggingPrism = true;
+                handlePrismPointer(e.touches[0].clientY);
+              }
+            },
+            { passive: false }
+          );
+
+          prismContainer.addEventListener(
+            'touchmove',
+            (e) => {
+              if (draggingPrism && e.touches && e.touches.length > 0) {
+                e.preventDefault();
+                handlePrismPointer(e.touches[0].clientY);
+              }
+            },
+            { passive: false }
+          );
+
+          prismContainer.addEventListener('touchend', () => {
+            draggingPrism = false;
+          });
+        }
+      }
+
+      // -------------------- 6. THIỆP TRI ÂN ĐÓNG / MỞ TƯƠNG TÁC --------------------
+      function setupGreetingCard() {
+        const closedEl = document.getElementById('envelope-closed');
+        const openedEl = document.getElementById('envelope-opened');
+        const openBtn = document.getElementById('open-envelope-btn');
+        const closeBtn = document.getElementById('close-envelope-btn');
+        const celebrateBtn = document.getElementById('celebrate-letter-btn');
+        const heroOpenLink = document.getElementById('hero-open-card-link');
+
+        function openCard() {
+          if (!closedEl || !openedEl) return;
+          closedEl.classList.add('hidden');
+          openedEl.classList.remove('hidden');
+          if (!musicPlaying && !musicUserPaused) {
+            startBackgroundMusic(true);
+          }
+          triggerCelebrationSalvo();
+          showToast('💌 Đã mở thiệp tri ân gửi Cô Nguyễn Thị Thuý!', 'success');
+        }
+
+        function closeCard() {
+          if (!closedEl || !openedEl) return;
+          openedEl.classList.add('hidden');
+          closedEl.classList.remove('hidden');
+          playChime('spark');
+        }
+
+        if (openBtn) {
+          openBtn.addEventListener('click', openCard);
+        }
+
+        if (closeBtn) {
+          closeBtn.addEventListener('click', closeCard);
+        }
+
+        if (celebrateBtn) {
+          celebrateBtn.addEventListener('click', () => {
+            triggerCelebrationSalvo();
+          });
+        }
+
+        if (heroOpenLink) {
+          heroOpenLink.addEventListener('click', () => {
+            if (closedEl && !closedEl.classList.contains('hidden')) {
+              setTimeout(openCard, 450);
+            }
+          });
+        }
+      }
+
+      // -------------------- 7. HỘP QUÀ LƯỢNG TỬ DÀNH TẶNG CÔ NGUYỄN THỊ THUÝ --------------------
+      const QUANTUM_GIFTS = [
+        {
+          id: 'energy',
+          icon: '⚡',
+          label: 'Hạt Năng Lượng',
+          formula: 'W = const',
+          accent: 'amber',
+          title: 'Sức Khỏe Bền Bỉ',
+          message:
+            'Chúc Cô Nguyễn Thị Thuý luôn có nguồn năng lượng dồi dào, sức khỏe bền bỉ để mỗi ngày đến lớp đều thật nhẹ nhàng, vui tươi và rạng rỡ.'
+        },
+        {
+          id: 'spectrum',
+          icon: '🌈',
+          label: 'Hạt Quang Phổ',
+          formula: 'λ: 380–760nm',
+          accent: 'cyan',
+          title: 'Hạnh Phúc Đủ Đầy',
+          message:
+            'Chúc cuộc sống của cô luôn rực rỡ như dải quang phổ cầu vồng — ngập tràn yêu thương, may mắn và những khoảnh khắc thật đáng nhớ.'
+        },
+        {
+          id: 'passion',
+          icon: '🔥',
+          label: 'Hạt Nhiệt Huyết',
+          formula: 'Q = m·c·Δt',
+          accent: 'rose',
+          title: 'Ngọn Lửa Yêu Nghề',
+          message:
+            'Cảm ơn cô đã luôn giữ ngọn lửa nhiệt huyết ấm áp, biến từng tiết học Vật Lí thành hành trình khám phá đầy thú vị và truyền cảm hứng cho chúng em.'
+        },
+        {
+          id: 'compass',
+          icon: '🧭',
+          label: 'Hạt Định Hướng',
+          formula: 'F = q·v·B',
+          accent: 'emerald',
+          title: 'Người Dẫn Lối Tận Tâm',
+          message:
+            'Cô luôn là chiếc la bàn dịu dàng và chuẩn xác, kiên nhẫn chỉ bảo để chúng em tự tin giải mã không chỉ bài toán Vật Lí mà cả những bài toán của tuổi trẻ.'
+        },
+        {
+          id: 'resonance',
+          icon: '〰️',
+          label: 'Hạt Cộng Hưởng',
+          formula: 'f = f₀ ⇒ A_max',
+          accent: 'violet',
+          title: 'Niềm Vui Nhân Đôi',
+          message:
+            'Chúc mọi tâm huyết cô gieo trồng đều gặp sự cộng hưởng tuyệt vời — gặt hái thật nhiều thành công và đón nhận tình cảm chân thành từ bao thế hệ học trò.'
+        },
+        {
+          id: 'gratitude',
+          icon: '🌌',
+          label: 'Hạt Biết Ơn',
+          formula: 't → ∞',
+          accent: 'yellow',
+          title: 'Tri Ân Mãi Mãi',
+          message:
+            'Dù thời gian có trôi qua bao lâu, những lời dạy ân cần và hình ảnh cô giáo Nguyễn Thị Thuý tận tụy trên bục giảng sẽ mãi là ký ức đẹp nhất trong lòng chúng em.'
+        }
+      ];
+
+      const openedGiftIds = new Set();
+
+      function getAccentStyles(accent) {
+        const map = {
+          amber: {
+            border: 'border-amber-300/45',
+            badge: 'bg-amber-400/15 text-amber-200 border-amber-300/30',
+            glow: 'from-amber-400/15 to-orange-500/10'
+          },
+          cyan: {
+            border: 'border-cyan-300/45',
+            badge: 'bg-cyan-400/15 text-cyan-200 border-cyan-300/30',
+            glow: 'from-cyan-400/15 to-sky-500/10'
+          },
+          rose: {
+            border: 'border-rose-300/45',
+            badge: 'bg-rose-400/15 text-rose-200 border-rose-300/30',
+            glow: 'from-rose-400/15 to-pink-500/10'
+          },
+          emerald: {
+            border: 'border-emerald-300/45',
+            badge: 'bg-emerald-400/15 text-emerald-200 border-emerald-300/30',
+            glow: 'from-emerald-400/15 to-teal-500/10'
+          },
+          violet: {
+            border: 'border-violet-300/45',
+            badge: 'bg-violet-400/15 text-violet-200 border-violet-300/30',
+            glow: 'from-violet-400/15 to-fuchsia-500/10'
+          },
+          yellow: {
+            border: 'border-yellow-300/45',
+            badge: 'bg-yellow-400/15 text-yellow-200 border-yellow-300/30',
+            glow: 'from-yellow-400/15 to-amber-500/10'
+          }
+        };
+        return map[accent] || map.amber;
+      }
+
+      function updateGiftProgressUI() {
+        const count = openedGiftIds.size;
+        const total = QUANTUM_GIFTS.length;
+        const textEl = document.getElementById('gift-progress-text');
+        const barEl = document.getElementById('gift-progress-bar');
+        const finaleEl = document.getElementById('finale-bouquet-card');
+        const openAllBtn = document.getElementById('open-all-gifts-btn');
+
+        if (textEl) textEl.textContent = `${count} / ${total} hạt quà`;
+        if (barEl) barEl.style.width = `${(count / total) * 100}%`;
+
+        if (count === total) {
+          if (finaleEl && finaleEl.classList.contains('hidden')) {
+            finaleEl.classList.remove('hidden');
+            setTimeout(() => {
+              triggerCelebrationSalvo();
+              showToast('💐 Cô đã mở trọn vẹn 6 hạt lời chúc 20/11!', 'success');
+            }, 200);
+          }
+          if (openAllBtn) {
+            openAllBtn.textContent = '✨ Đã Mở Đủ 6 Quà';
+            openAllBtn.classList.add('opacity-75');
+          }
+        }
+      }
+
+      function renderQuantumGifts() {
+        const grid = document.getElementById('quantum-gifts-grid');
+        if (!grid) return;
+
+        grid.innerHTML = QUANTUM_GIFTS.map((gift, index) => {
+          const isOpened = openedGiftIds.has(gift.id);
+          const styles = getAccentStyles(gift.accent);
+
+          if (!isOpened) {
+            // Trạng thái hộp quà chưa mở (Chạm để mở khóa)
+            return `
+              <button type="button" data-gift-id="${gift.id}"
+                class="quantum-gift-card group text-left p-6 rounded-3xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:${styles.border} backdrop-blur-md transition duration-300 flex flex-col justify-between min-h-[210px] active:scale-[0.98] focus:outline-none">
+                <div class="flex items-center justify-between w-full">
+                  <span class="w-12 h-12 rounded-2xl bg-gradient-to-br ${styles.glow} border ${styles.border} flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                    ${gift.icon}
+                  </span>
+                  <span class="px-2.5 py-1 rounded-xl bg-slate-900/80 border border-white/10 text-slate-300 font-mono text-xs">
+                    ${gift.formula}
+                  </span>
+                </div>
+
+                <div class="my-5">
+                  <p class="text-[11px] uppercase tracking-[0.18em] text-slate-400 mb-1">Hạt Quà #0${index + 1}</p>
+                  <h3 class="font-serif text-xl font-bold text-white group-hover:text-amber-200 transition">${gift.label}</h3>
+                </div>
+
+                <div class="w-full pt-3 border-t border-white/10 flex items-center justify-between text-xs sm:text-sm font-medium text-amber-300">
+                  <span>✨ Chạm để mở lời chúc</span>
+                  <span class="group-hover:translate-x-1 transition">→</span>
+                </div>
+              </button>
+            `;
+          }
+
+          // Trạng thái hộp quà đã mở (Hiển thị trọn vẹn lời chúc cho Cô Thuý)
+          return `
+            <div class="p-6 rounded-3xl bg-gradient-to-br ${styles.glow} border ${styles.border} backdrop-blur-md flex flex-col justify-between min-h-[210px] shadow-lg transition duration-500">
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-10 h-10 rounded-xl bg-slate-950/60 border ${styles.border} flex items-center justify-center text-xl">
+                    ${gift.icon}
+                  </span>
+                  <h3 class="font-serif text-lg sm:text-xl font-bold text-white leading-tight">${gift.title}</h3>
+                </div>
+                <span class="px-2.5 py-1 rounded-xl border text-[11px] font-mono shrink-0 ${styles.badge}">
+                  ${gift.formula}
+                </span>
+              </div>
+
+              <p class="text-slate-100 text-sm leading-relaxed my-2">
+                “${gift.message}”
+              </p>
+
+              <div class="pt-3 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-300">
+                <span>${gift.label}</span>
+                <span class="text-amber-200 font-semibold">✓ Đã mở</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Gắn sự kiện click/chạm cho các hộp quà chưa mở
+        const cardButtons = grid.querySelectorAll('.quantum-gift-card');
+        cardButtons.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const giftId = btn.getAttribute('data-gift-id');
+            if (!giftId || openedGiftIds.has(giftId)) return;
+
+            const rect = btn.getBoundingClientRect();
+            openedGiftIds.add(giftId);
+            playChime('spark');
+            launchFireworkBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 26);
+
+            renderQuantumGifts();
+            updateGiftProgressUI();
+          });
+        });
+      }
+
+      function setupQuantumGifts() {
+        renderQuantumGifts();
+        updateGiftProgressUI();
+
+        const openAllBtn = document.getElementById('open-all-gifts-btn');
+        if (openAllBtn) {
+          openAllBtn.addEventListener('click', () => {
+            if (openedGiftIds.size === QUANTUM_GIFTS.length) {
+              triggerCelebrationSalvo();
+              return;
+            }
+            QUANTUM_GIFTS.forEach((g) => openedGiftIds.add(g.id));
+            renderQuantumGifts();
+            updateGiftProgressUI();
+          });
+        }
+
+        const finaleBtn = document.getElementById('finale-celebrate-btn');
+        if (finaleBtn) {
+          finaleBtn.addEventListener('click', () => {
+            triggerCelebrationSalvo();
+          });
+        }
+      }
+
+      // -------------------- 7B. MODAL HIỆN TƯỢNG VẬT LÍ CHO 4 ĐỊNH LUẬT TRI ÂN --------------------
+      const LAW_EXPERIENCES = {
+        conservation: {
+          icon: '⚡',
+          formula: 'W = Wđ + Wt = const',
+          formulaClass: 'text-amber-300',
+          borderClass: 'from-amber-300/75 via-orange-400/50 to-yellow-300/70',
+          title: 'Định Luật Bảo Toàn Tri Thức',
+          simBadge: '⚡ Mô phỏng: Con lắc chuyển hóa Wđ ↔ Wt',
+          wish:
+            'Kiến thức và tâm huyết cô trao đi không bao giờ mất đi, mà chuyển hóa từ trang giáo án thành bản lĩnh, ước mơ và thành công của mỗi học trò trên chặng đường tương lai.',
+          extra:
+            'Kính chúc Cô Nguyễn Thị Thuý luôn dồi dào sức khỏe và giữ mãi nguồn năng lượng yêu nghề bất tận!'
+        },
+        dispersion: {
+          icon: '🌈',
+          formula: 'n₁·sin(i) = n₂·sin(r)',
+          formulaClass: 'text-cyan-300',
+          borderClass: 'from-cyan-300/75 via-sky-400/50 to-violet-400/70',
+          title: 'Hiện Tượng Tán Sắc Ước Mơ',
+          simBadge: '🌈 Mô phỏng: Tán sắc sóng ánh sáng 7 màu',
+          wish:
+            'Cô tựa như chiếc lăng kính thủy tinh tinh khiết, giúp mỗi học sinh khám phá dải quang phổ rực rỡ nhất của chính mình — nơi mỗi cá tính đều tỏa sáng theo một bước sóng riêng.',
+          extra:
+            'Chúc cuộc sống của cô luôn rực rỡ sắc màu hạnh phúc, bình an và thật nhiều niềm vui mỗi ngày!'
+        },
+        gravity: {
+          icon: '🌌',
+          formula: 'F = G · (m₁m₂ / r²)',
+          formulaClass: 'text-violet-300',
+          borderClass: 'from-violet-400/75 via-indigo-400/50 to-cyan-300/70',
+          title: 'Trường Hấp Dẫn Của Sự Tận Tâm',
+          simBadge: '🌌 Mô phỏng: Quỹ đạo hấp dẫn hướng về Cô Thuý',
+          wish:
+            'Sự dịu dàng và nghiêm túc của cô tạo nên một lực hấp dẫn kỳ diệu. Dù sau này chúng em có bay xa đến đâu, trái tim vẫn luôn hướng về mái trường và những giờ học Vật Lí của cô.',
+          extra:
+            'Cảm ơn cô vì luôn là điểm tựa ấm áp dẫn lối cho bao thế hệ học trò trưởng thành!'
+        },
+        resonance: {
+          icon: '〰️',
+          formula: 'f = f₀ ⇒ A → A_max',
+          formulaClass: 'text-rose-300',
+          borderClass: 'from-rose-400/75 via-pink-400/50 to-amber-300/70',
+          title: 'Sự Cộng Hưởng Của Niềm Đam Mê',
+          simBadge: '〰️ Mô phỏng: Cộng hưởng sóng khi f → f₀',
+          wish:
+            'Khi nhiệt huyết truyền đạt của cô gặp đúng tần số ham học hỏi của học trò, hiện tượng cộng hưởng xảy ra — đẩy biên độ sáng tạo và niềm vui học tập lên mức cực đại.',
+          extra:
+            'Chúc cô một ngày 20/11 thật ý nghĩa, ngập tràn hoa tươi và sự cộng hưởng yêu thương từ mọi học trò!'
+        }
+      };
+
+      const lawModalEl = document.getElementById('law-modal');
+      const lawModalCanvas = document.getElementById('law-modal-canvas');
+      const lawModalWrap = document.getElementById('law-modal-canvas-wrap');
+      const lawModalCtx = lawModalCanvas ? lawModalCanvas.getContext('2d') : null;
+
+      let activeLawKey = null;
+      let lawModalWidth = 480;
+      let lawModalHeight = 240;
+      let lawSimTime = 0;
+      let pendulumTrail = [];
+
+      function resizeLawModalCanvas() {
+        if (!lawModalCanvas || !lawModalWrap || !lawModalCtx || !activeLawKey) return;
+        const rect = lawModalWrap.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        lawModalWidth = Math.max(rect.width, 260);
+        lawModalHeight = Math.max(rect.height, 200);
+        lawModalCanvas.width = Math.round(lawModalWidth * dpr);
+        lawModalCanvas.height = Math.round(lawModalHeight * dpr);
+        lawModalCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function drawConservationSim(ctx, w, h, t) {
+        // Nền lưới phòng thí nghiệm tinh tế
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.06)';
+        ctx.lineWidth = 1;
+        for (let gx = 0; gx < w; gx += 26) {
+          ctx.beginPath();
+          ctx.moveTo(gx, 0);
+          ctx.lineTo(gx, h);
+          ctx.stroke();
+        }
+        for (let gy = 0; gy < h; gy += 26) {
+          ctx.beginPath();
+          ctx.moveTo(0, gy);
+          ctx.lineTo(w, gy);
+          ctx.stroke();
+        }
+
+        // Con lắc đơn dao động điều hòa chuyển hóa Wđ <-> Wt (hạ thấp điểm treo tránh bị nhãn góc trên che)
+        const pivotX = w * 0.5;
+        const pivotY = 44;
+        const length = Math.min(h * 0.45, 108);
+        const maxTheta = 0.66;
+        const theta = maxTheta * Math.sin(t * 2.3);
+        const bobX = pivotX + Math.sin(theta) * length;
+        const bobY = pivotY + Math.cos(theta) * length;
+
+        // Tỉ lệ Thế năng (Wt) và Động năng (Wđ) luôn có tổng = 1 (Bảo toàn)
+        const wtRatio = Math.pow(Math.sin(t * 2.3), 2);
+        const wdRatio = 1 - wtRatio;
+
+        pendulumTrail.push({ x: bobX, y: bobY });
+        if (pendulumTrail.length > 26) pendulumTrail.shift();
+
+        // Quỹ đạo cung tròn mờ
+        ctx.save();
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.16)';
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(pivotX, pivotY, length, Math.PI * 0.5 - maxTheta, Math.PI * 0.5 + maxTheta);
+        ctx.stroke();
+        ctx.restore();
+
+        // Vệt sáng chuyển động của quả cầu năng lượng
+        for (let i = 1; i < pendulumTrail.length; i++) {
+          const alpha = (i / pendulumTrail.length) * 0.55;
+          ctx.beginPath();
+          ctx.moveTo(pendulumTrail[i - 1].x, pendulumTrail[i - 1].y);
+          ctx.lineTo(pendulumTrail[i].x, pendulumTrail[i].y);
+          ctx.strokeStyle = `rgba(251, 191, 36, ${alpha})`;
+          ctx.lineWidth = (i / pendulumTrail.length) * 7;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+        }
+
+        // Dây treo & điểm treo
+        ctx.strokeStyle = 'rgba(226, 232, 240, 0.65)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(pivotX, pivotY);
+        ctx.lineTo(bobX, bobY);
+        ctx.stroke();
+
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.arc(pivotX, pivotY, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Quả cầu ánh sáng đổi sắc nhẹ giữa vàng (Wt) và xanh cyan (Wđ)
+        ctx.save();
+        const bobGrad = ctx.createRadialGradient(bobX - 3, bobY - 3, 2, bobX, bobY, 16);
+        bobGrad.addColorStop(0, '#ffffff');
+        bobGrad.addColorStop(0.45, wdRatio > 0.5 ? '#38bdf8' : '#fbbf24');
+        bobGrad.addColorStop(1, wdRatio > 0.5 ? 'rgba(56, 189, 248, 0.25)' : 'rgba(245, 158, 11, 0.25)');
+        ctx.fillStyle = bobGrad;
+        ctx.shadowColor = wdRatio > 0.5 ? '#38bdf8' : '#fbbf24';
+        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.arc(bobX, bobY, 13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Thanh đo Động năng (Wđ) + Thế năng (Wt) = Tổng năng lượng (100%) ở đáy khung
+        const barY = h - 32;
+        const barW = Math.min(w - 40, 320);
+        const barX = (w - barW) / 2;
+        const barH = 12;
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.fillRect(barX, barY, barW, barH);
+
+        const wdW = barW * wdRatio;
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(barX, barY, wdW, barH);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(barX + wdW, barY, barW - wdW, barH);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barX, barY, barW, barH);
+
+        ctx.font = '600 11px Inter, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#7dd3fc';
+        ctx.fillText(`Wđ: ${Math.round(wdRatio * 100)}%`, barX, barY - 6);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillText('W = 100%', barX + barW / 2, barY - 6);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#fde68a';
+        ctx.fillText(`Wt: ${Math.round(wtRatio * 100)}%`, barX + barW, barY - 6);
+      }
+
+      function drawDispersionSim(ctx, w, h, t) {
+        const prismX = w * 0.28;
+        const prismY = h * 0.54;
+        const size = Math.min(w * 0.2, h * 0.38);
+        const triH = (Math.sqrt(3) / 2) * size;
+
+        const topV = { x: prismX, y: prismY - triH * 0.6 };
+        const leftV = { x: prismX - size / 2, y: prismY + triH * 0.4 };
+        const rightV = { x: prismX + size / 2, y: prismY + triH * 0.4 };
+
+        const hitX = topV.x + (leftV.x - topV.x) * 0.5;
+        const hitY = topV.y + (leftV.y - topV.y) * 0.5;
+
+        // Tia sáng trắng đập vào mặt trái
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+        ctx.lineWidth = 9;
+        ctx.beginPath();
+        ctx.moveTo(0, hitY + 18 + Math.sin(t * 1.4) * 8);
+        ctx.lineTo(hitX, hitY);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#fef08a';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.moveTo(0, hitY + 18 + Math.sin(t * 1.4) * 8);
+        ctx.lineTo(hitX, hitY);
+        ctx.stroke();
+        ctx.restore();
+
+        // 7 dải sóng quang phổ lan truyền kèm hạt photon lấp lánh
+        const colors = ['#ff4d4d', '#ff944d', '#ffd633', '#4ade80', '#38bdf8', '#818cf8', '#d946ef'];
+        colors.forEach((col, idx) => {
+          const offset = idx - 3;
+          const exitT = 0.48 + offset * 0.06;
+          const ex = topV.x + (rightV.x - topV.x) * exitT;
+          const ey = topV.y + (rightV.y - topV.y) * exitT;
+          const targetY = h * 0.52 + offset * (h * 0.115);
+
+          // Tia khúc xạ bên trong lăng kính
+          ctx.beginPath();
+          ctx.moveTo(hitX, hitY);
+          ctx.lineTo(ex, ey);
+          ctx.strokeStyle = col;
+          ctx.globalAlpha = 0.65;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // Dải sóng màu sắc lan sang phải (bước sóng ngắn dần từ đỏ -> tím)
+          ctx.save();
+          ctx.globalAlpha = 0.9;
+          ctx.strokeStyle = col;
+          ctx.shadowColor = col;
+          ctx.shadowBlur = 10;
+          ctx.lineWidth = 2.8;
+          ctx.beginPath();
+          const steps = 42;
+          const freq = 0.06 + idx * 0.015;
+          for (let s = 0; s <= steps; s++) {
+            const p = s / steps;
+            const px = ex + (w - ex) * p;
+            const baseY = ey + (targetY - ey) * p;
+            const wave = Math.sin(px * freq - t * 5.2) * (3.2 * p);
+            if (s === 0) ctx.moveTo(px, baseY + wave);
+            else ctx.lineTo(px, baseY + wave);
+          }
+          ctx.stroke();
+
+          // Hạt photon trượt dọc theo từng dải màu
+          const photonP = (t * 0.48 + idx * 0.13) % 1;
+          const phX = ex + (w - ex) * photonP;
+          const phY = ey + (targetY - ey) * photonP + Math.sin(phX * freq - t * 5.2) * (3.2 * photonP);
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(phX, phY, 2.8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+        ctx.globalAlpha = 1;
+
+        // Vẽ khối lăng kính thủy tinh
+        ctx.save();
+        const glassGrad = ctx.createLinearGradient(leftV.x, topV.y, rightV.x, rightV.y);
+        glassGrad.addColorStop(0, 'rgba(224, 242, 254, 0.28)');
+        glassGrad.addColorStop(1, 'rgba(56, 189, 248, 0.12)');
+        ctx.beginPath();
+        ctx.moveTo(topV.x, topV.y);
+        ctx.lineTo(rightV.x, rightV.y);
+        ctx.lineTo(leftV.x, leftV.y);
+        ctx.closePath();
+        ctx.fillStyle = glassGrad;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(226, 232, 240, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawGravitySim(ctx, w, h, t) {
+        const cx = w * 0.5;
+        const cy = h * 0.52;
+
+        // Lưới không-thời gian uốn cong nhẹ về tâm hấp dẫn
+        ctx.save();
+        ctx.strokeStyle = 'rgba(139, 92, 246, 0.18)';
+        ctx.lineWidth = 1;
+        for (let r = 28; r <= Math.max(w, h) * 0.55; r += 28) {
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r * 1.45, r * 0.62, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // 4 hành tinh học trò quay quanh mặt trời tri thức Cô Thuý
+        const orbits = [
+          { rx: w * 0.18, ry: h * 0.2, speed: 1.55, phase: 0.4, color: '#38bdf8', r: 5 },
+          { rx: w * 0.27, ry: h * 0.29, speed: 1.12, phase: 2.1, color: '#c084fc', r: 6 },
+          { rx: w * 0.36, ry: h * 0.36, speed: 0.82, phase: 4.0, color: '#4ade80', r: 5.5 },
+          { rx: w * 0.43, ry: h * 0.42, speed: 0.62, phase: 5.4, color: '#fb7185', r: 4.8 }
+        ];
+
+        orbits.forEach((orb) => {
+          const angle = t * orb.speed + orb.phase;
+          const px = cx + Math.cos(angle) * orb.rx;
+          const py = cy + Math.sin(angle) * orb.ry;
+
+          // Đường lực hấp dẫn hướng về tâm
+          ctx.save();
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.22)';
+          ctx.setLineDash([3, 4]);
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(cx, cy);
+          ctx.stroke();
+          ctx.restore();
+
+          // Đuôi sao sáng trên quỹ đạo
+          for (let k = 1; k <= 10; k++) {
+            const prevAngle = angle - k * 0.08;
+            const tx = cx + Math.cos(prevAngle) * orb.rx;
+            const ty = cy + Math.sin(prevAngle) * orb.ry;
+            ctx.beginPath();
+            ctx.arc(tx, ty, orb.r * (1 - k / 12) * 0.65, 0, Math.PI * 2);
+            ctx.fillStyle = orb.color;
+            ctx.globalAlpha = (1 - k / 11) * 0.4;
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+
+          // Quả cầu hành tinh
+          ctx.save();
+          ctx.fillStyle = orb.color;
+          ctx.shadowColor = orb.color;
+          ctx.shadowBlur = 12;
+          ctx.beginPath();
+          ctx.arc(px, py, orb.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+
+        // Mặt trời trung tâm "Cô Thuý" phát hào quang ấm áp
+        ctx.save();
+        const pulse = 1 + Math.sin(t * 2.5) * 0.06;
+        const sunGrad = ctx.createRadialGradient(cx, cy, 4, cx, cy, 34 * pulse);
+        sunGrad.addColorStop(0, '#fef9c3');
+        sunGrad.addColorStop(0.45, '#f59e0b');
+        sunGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        ctx.fillStyle = sunGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 34 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#fffbeb';
+        ctx.font = '700 11px "Playfair Display", serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(2, 6, 23, 0.9)';
+        ctx.shadowBlur = 6;
+        ctx.fillText('Cô Thuý', cx, cy);
+        ctx.restore();
+      }
+
+      function drawResonanceSim(ctx, w, h, t) {
+        const midY = h * 0.54;
+        // Mức độ đồng bộ tần số dao động mượt từ 0 -> 1 -> 0 tạo hiệu ứng cộng hưởng rõ rệt
+        const sync = 0.5 + 0.5 * Math.sin(t * 1.15 - Math.PI / 2);
+        const resonanceBoost = Math.pow(sync, 2.2);
+
+        // Đường trục cân bằng
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.18)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, midY);
+        ctx.lineTo(w, midY);
+        ctx.stroke();
+
+        // Sóng 1: Tần số truyền lửa của Cô (f₀ - màu vàng)
+        ctx.save();
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.45)';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        for (let x = 0; x <= w; x += 4) {
+          const y = midY + Math.sin(x * 0.035 - t * 3.8) * 20;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Sóng 2: Tần số học trò (f - màu xanh cyan) tiến dần về f₀
+        const studentFreq = 0.035 + (1 - sync) * 0.022;
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        for (let x = 0; x <= w; x += 4) {
+          const y = midY + Math.sin(x * studentFreq - t * 3.8) * 20;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Sóng tổng hợp cộng hưởng bùng nổ biên độ A -> A_max
+        const maxAmp = 24 + resonanceBoost * (h * 0.25);
+        const resGrad = ctx.createLinearGradient(0, 0, w, 0);
+        resGrad.addColorStop(0, '#fb7185');
+        resGrad.addColorStop(0.5, '#fbbf24');
+        resGrad.addColorStop(1, '#e879f9');
+
+        ctx.strokeStyle = resGrad;
+        ctx.lineWidth = 3 + resonanceBoost * 2.2;
+        ctx.shadowColor = '#fb7185';
+        ctx.shadowBlur = 10 + resonanceBoost * 16;
+        ctx.beginPath();
+        for (let x = 0; x <= w; x += 3) {
+          const env = Math.sin((x / w) * Math.PI);
+          const wave = Math.sin(x * 0.035 - t * 3.8);
+          const y = midY + wave * maxAmp * (0.45 + 0.55 * env);
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        // Nhãn trạng thái tần số trực quan ở đáy khung
+        ctx.font = '600 11.5px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = resonanceBoost > 0.72 ? '#fda4af' : '#cbd5e1';
+        const statusText =
+          resonanceBoost > 0.72
+            ? '✨ Cộng hưởng cực đại! (f = f₀ ⇒ A → A_max)'
+            : `Đang đồng bộ tần số Cô & Trò: ${Math.round(sync * 100)}%`;
+        ctx.fillText(statusText, w * 0.5, h - 14);
+      }
+
+      function renderLawModalFrame() {
+        if (!activeLawKey || !lawModalCtx) return;
+        lawSimTime += 0.016;
+
+        const w = lawModalWidth;
+        const h = lawModalHeight;
+        lawModalCtx.clearRect(0, 0, w, h);
+
+        if (activeLawKey === 'conservation') {
+          drawConservationSim(lawModalCtx, w, h, lawSimTime);
+        } else if (activeLawKey === 'dispersion') {
+          drawDispersionSim(lawModalCtx, w, h, lawSimTime);
+        } else if (activeLawKey === 'gravity') {
+          drawGravitySim(lawModalCtx, w, h, lawSimTime);
+        } else if (activeLawKey === 'resonance') {
+          drawResonanceSim(lawModalCtx, w, h, lawSimTime);
+        }
+      }
+
+      function openLawModal(lawKey) {
+        const data = LAW_EXPERIENCES[lawKey];
+        if (!data || !lawModalEl) return;
+
+        activeLawKey = lawKey;
+        lawSimTime = 0;
+        pendulumTrail = [];
+
+        const iconEl = document.getElementById('law-modal-icon');
+        const formulaEl = document.getElementById('law-modal-formula');
+        const borderEl = document.getElementById('law-modal-border');
+        const titleEl = document.getElementById('law-modal-title');
+        const simBadgeEl = document.getElementById('law-modal-sim-badge');
+        const wishEl = document.getElementById('law-modal-wish');
+        const extraEl = document.getElementById('law-modal-extra');
+
+        if (iconEl) iconEl.textContent = data.icon;
+        if (formulaEl) {
+          formulaEl.textContent = data.formula;
+          formulaEl.className = `inline-block px-2.5 py-0.5 rounded-lg bg-slate-950/90 border border-white/10 font-mono text-xs mb-1 ${data.formulaClass}`;
+        }
+        if (borderEl) {
+          borderEl.className = `relative w-full max-w-xl max-h-[90vh] flex flex-col rounded-3xl p-[1.5px] bg-gradient-to-br ${data.borderClass} shadow-2xl`;
+        }
+        if (titleEl) titleEl.textContent = data.title;
+        if (simBadgeEl) simBadgeEl.textContent = data.simBadge;
+        if (wishEl) wishEl.textContent = data.wish;
+        if (extraEl) extraEl.textContent = data.extra;
+
+        // Đánh dấu thẻ định luật này đã được cô xem
+        const viewedBadge = document.querySelector(`[data-law-viewed="${lawKey}"]`);
+        if (viewedBadge) viewedBadge.classList.remove('hidden');
+
+        lawModalEl.classList.remove('hidden');
+        lawModalEl.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+
+        // Đồng bộ kích thước canvas ngay lập tức và xác nhận lại ở khung hình kế tiếp
+        resizeLawModalCanvas();
+        requestAnimationFrame(() => {
+          resizeLawModalCanvas();
+        });
+
+        playChime('spark');
+        launchFireworkBurst(window.innerWidth * 0.5, window.innerHeight * 0.25, 30);
+      }
+
+      function closeLawModal() {
+        if (!lawModalEl) return;
+        activeLawKey = null;
+        lawModalEl.classList.add('hidden');
+        lawModalEl.classList.remove('flex');
+        document.body.style.overflow = '';
+      }
+
+      function setupLawModal() {
+        const openButtons = document.querySelectorAll('[data-open-law]');
+        openButtons.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const key = btn.getAttribute('data-open-law');
+            if (key) openLawModal(key);
+          });
+        });
+
+        const closeBtn = document.getElementById('law-modal-close-btn');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', closeLawModal);
+        }
+
+        const sparkBtn = document.getElementById('law-modal-spark-btn');
+        if (sparkBtn) {
+          sparkBtn.addEventListener('click', () => {
+            triggerCelebrationSalvo();
+          });
+        }
+
+        // Chạm ra vùng tối bên ngoài hộp thoại cũng đóng gọn
+        if (lawModalEl) {
+          lawModalEl.addEventListener('click', (e) => {
+            if (e.target === lawModalEl) closeLawModal();
+          });
+        }
+
+        // Hỗ trợ phím Escape trên máy tính
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && activeLawKey) {
+            closeLawModal();
+          }
+        });
+      }
+
+      // -------------------- 8. CÁC NÚT TƯƠNG TÁC NHANH KHÁC --------------------
+      function setupExtras() {
+        const quickFwBtn = document.getElementById('quick-firework-btn');
+        if (quickFwBtn) {
+          quickFwBtn.addEventListener('click', () => {
+            triggerCelebrationSalvo();
+          });
+        }
+
+        const heartBtn = document.getElementById('photon-heart-btn');
+        const heartCounter = document.getElementById('heart-counter');
+        let hearts = 2011;
+
+        if (heartBtn && heartCounter) {
+          heartBtn.addEventListener('click', (e) => {
+            hearts += 1;
+            heartCounter.textContent = hearts.toString();
+            playChime('heart');
+            const rect = heartBtn.getBoundingClientRect();
+            launchFireworkBurst(rect.left + rect.width / 2, rect.top, 24);
+          });
+        }
+      }
+
+      // -------------------- 9. VÒNG LẶP ANIMATION CHÍNH --------------------
+      function animateLoop() {
+        renderBgFrame();
+        renderPrismFrame();
+        renderLawModalFrame();
+        renderFireworksFrame();
+        requestAnimationFrame(animateLoop);
+      }
+
+      // Khởi chạy toàn bộ ứng dụng sau khi trang tải hoàn chỉnh
+      let appInitialized = false;
+      function startApp() {
+        if (appInitialized) return;
+        appInitialized = true;
+
+        try {
+          resizeBgCanvas();
+          resizeFwCanvas();
+          resizePrismCanvas();
+          updatePrismReadout();
+
+          setupSoundToggle();
+          setupGreetingCard();
+          setupPrismControls();
+          setupQuantumGifts();
+          setupLawModal();
+          setupExtras();
+
+          // Tự động cập nhật kích thước các canvas khi thay đổi màn hình / xoay điện thoại
+          let resizeTimer = null;
+          window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+              resizeBgCanvas();
+              resizeFwCanvas();
+              resizePrismCanvas();
+              resizeLawModalCanvas();
+            }, 120);
+          });
+
+          // Bắt đầu vòng lặp đồ họa
+          animateLoop();
+
+          // Một chùm pháo hoa chào mừng nhẹ nhàng sau khi vào trang
+          setTimeout(() => {
+            launchFireworkBurst(window.innerWidth * 0.5, window.innerHeight * 0.25, 36);
+          }, 700);
+        } catch (err) {
+          console.error('Lỗi khởi tạo trang web 20/11:', err);
+        }
+      }
+
+      window.onload = function () {
+        startApp();
+      };
+
+      // Dự phòng trường hợp DOM đã sẵn sàng trước khi sự kiện onload kích hoạt trong khung xem trước
+      if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        startApp();
+      }
+    })();
+  </script>
+</body>
+</html>
